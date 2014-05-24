@@ -83,4 +83,49 @@ public interface Database {
      * @return true if successful, false otherwise
      */
     boolean updateTask(Task task);
+
+    /**
+     * Deletes list with the specified identifier
+     *
+     * @param identifier unique identifier of list to delete
+     *
+     * @return true if successful, false otherwise
+     */
+    boolean deleteList(String identifier);
+
+    /**
+     * Deletes the lists with the given identifiers
+     *
+     * @param identifiers Array of unique identifiers of the lists to delete
+     *
+     * @return true if successful, false otherwise
+     */
+    boolean deleteLists(List<String> identifiers);
+
+    /**
+     * Deletes task with the specified identifier
+     *
+     * @param identifier unique identifier of task to delete
+     *
+     * @return true if successful, false otherwise
+     */
+    boolean deleteTask(String identifier);
+
+    /**
+     * Deletes the tasks with the given identifiers
+     *
+     * @param identifiers Array of unique identifiers of the tasks to delete
+     *
+     * @return true if successful, false otherwise
+     */
+    boolean deleteTasks(List<String> identifiers);
+
+    /**
+     * Deletes all tasks for a TaskList
+     *
+     * @param identifier unique identifier of list whose tasks are being deleted
+     *
+     * @return true if successful, false otherwise
+     */
+    boolean deleteAllTasksForList(String identifier);
 }

@@ -176,7 +176,9 @@ public class TaskListFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             taskLists.clear();
-            taskLists.addAll(new DatabaseAccessor().getAllLists());
+            List<TaskList> result = new DatabaseAccessor().getAllLists();
+            if ( result != null )
+                taskLists.addAll(result);
             return taskLists != null;
         }
 

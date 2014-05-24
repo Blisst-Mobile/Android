@@ -224,4 +224,89 @@ public class DatabaseAccessor implements Database {
         return result > 0;
     }
 
+    @Override
+    public boolean deleteList(String identifier) {
+        SQLiteDatabase db = SQLiteHelper.getInstance(GlobalContext.getAppContext()).getWritableDatabase();
+        db.beginTransaction();
+        int result = 0;
+        try {
+
+            result = db.delete(SQLiteHelper.TABLE_LISTS, SQLiteHelper.SQL_WHERE_BY_ID, new String[] { identifier });
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return result > 0;
+    }
+
+    @Override
+    public boolean deleteLists(List<String> identifiers) {
+        SQLiteDatabase db = SQLiteHelper.getInstance(GlobalContext.getAppContext()).getWritableDatabase();
+        db.beginTransaction();
+        int result = 0;
+        try {
+
+            result = db.delete(SQLiteHelper.TABLE_LISTS, SQLiteHelper.SQL_WHERE_BY_ID, (String[]) identifiers.toArray());
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return result > 0;
+    }
+
+    @Override
+    public boolean deleteTask(String identifier) {
+        SQLiteDatabase db = SQLiteHelper.getInstance(GlobalContext.getAppContext()).getWritableDatabase();
+        db.beginTransaction();
+        int result = 0;
+        try {
+
+            result = db.delete(SQLiteHelper.TABLE_TASKS, SQLiteHelper.SQL_WHERE_BY_ID, new String[] { identifier });
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return result > 0;
+    }
+
+    @Override
+    public boolean deleteTasks(List<String> identifiers) {
+        SQLiteDatabase db = SQLiteHelper.getInstance(GlobalContext.getAppContext()).getWritableDatabase();
+        db.beginTransaction();
+        int result = 0;
+        try {
+
+            result = db.delete(SQLiteHelper.TABLE_TASKS, SQLiteHelper.SQL_WHERE_BY_ID, (String[]) identifiers.toArray());
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return result > 0;
+    }
+
+    @Override
+    public boolean deleteAllTasksForList(String identifier) {
+        SQLiteDatabase db = SQLiteHelper.getInstance(GlobalContext.getAppContext()).getWritableDatabase();
+        db.beginTransaction();
+        int result = 0;
+        try {
+
+            result = db.delete(SQLiteHelper.TABLE_TASKS, SQLiteHelper.SQL_WHERE_BY_ID, new String[] { identifier });
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return result > 0;
+    }
+
 }
