@@ -14,7 +14,7 @@ public class TaskList {
     public boolean isComplete;
 
     public TaskList() {
-
+        this.identifier = UUID.randomUUID().toString();
     }
 
     public TaskList(String name, int numberOfTasks, int numberOfCompletedTasks, boolean isComplete) {

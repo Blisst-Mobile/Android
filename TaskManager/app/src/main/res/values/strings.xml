@@ -9,4 +9,7 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
 
+    <string name="list_name_not_valid">That is not a valid name for a list!</string>
+    <string name="error_list_database">Error adding list to database</string>
+    <string name="error_retrieving_lists">Error retrieving lists from database</string>
 </resources>
