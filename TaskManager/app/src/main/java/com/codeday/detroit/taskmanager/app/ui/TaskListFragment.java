@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.codeday.detroit.taskmanager.app.CDLog;
+import com.codeday.detroit.taskmanager.app.MainActivity;
 import com.codeday.detroit.taskmanager.app.R;
 
 public class TaskListFragment extends Fragment {
@@ -14,16 +16,24 @@ public class TaskListFragment extends Fragment {
 
     private View rootView;
 
+    private MainActivity.MenuInteractionListener menuInteractionListener;
+
     public static TaskListFragment getInstance() {
         TaskListFragment frag = new TaskListFragment();
         return frag;
     }
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public TaskListFragment() {
+        menuInteractionListener = new MainActivity.MenuInteractionListener() {
+            @Override
+            public void onAddButtonPressed() {
+                CDLog.debugLog(TAG, "Add Button Pressed!");
+            }
+        };
+    }
+
+    public MainActivity.MenuInteractionListener getMenuInteractionListener() {
+        return menuInteractionListener;
     }
 
     @Override

@@ -11,6 +11,13 @@ import com.codeday.detroit.taskmanager.app.ui.TaskListFragment;
 
 public class MainActivity extends FragmentActivity {
 
+
+    public interface MenuInteractionListener {
+        void onAddButtonPressed();
+    }
+
+    MenuInteractionListener menuInteractionListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +26,7 @@ public class MainActivity extends FragmentActivity {
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             TaskListFragment frag = TaskListFragment.getInstance();
+            menuInteractionListener = frag.getMenuInteractionListener();
             transaction.add(R.id.container, frag, TaskListFragment.TAG);
             transaction.commit();
         }
@@ -39,6 +47,8 @@ public class MainActivity extends FragmentActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_add) {
+            if ( menuInteractionListener != null )
+                menuInteractionListener.onAddButtonPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
