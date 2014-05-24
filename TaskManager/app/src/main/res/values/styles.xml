@@ -18,9 +18,11 @@
            parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textSize">26sp</item>
         <item name="android:textColor">@color/white</item>
-
-
     </style>
 
+    <style name="dialog_animation">
+        <item name="android:windowEnterAnimation">@anim/dialog_show_animation</item>
+        <item name="android:windowExitAnimation">@anim/dialog_hide_animation</item>
+    </style>
 
 </resources>
