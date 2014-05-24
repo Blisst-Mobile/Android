@@ -2,9 +2,11 @@ package com.codeday.detroit.taskmanager.app;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.codeday.detroit.taskmanager.app.ui.TaskListFragment;
 
 
 public class MainActivity extends FragmentActivity {
@@ -13,6 +15,13 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            TaskListFragment frag = TaskListFragment.getInstance();
+            transaction.add(R.id.container, frag, TaskListFragment.TAG);
+            transaction.commit();
+        }
     }
 
 
