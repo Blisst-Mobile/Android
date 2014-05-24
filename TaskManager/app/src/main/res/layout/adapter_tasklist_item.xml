@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:weightSum="1">
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_weight="0.95"
+            android:weightSum="1"
+            android:layout_height="79dp">
+
+        <TextView
+                android:id="@+id/taskListItemNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="List Name"
+                android:layout_weight="0.95"
+                android:textSize="30sp"/>
+
+        <TextView
+                android:id="@+id/taskListItemName"
+                android:layout_width="103dp"
+                android:layout_height="wrap_content"
+                android:text="X / Y"
+                android:layout_weight="0.05"
+                android:textSize="30sp"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/taskProgressBar"
+            android:orientation="horizontal"
+            android:layout_width="100dp"
+            android:layout_weight="0.05"
+            android:layout_height="1dp"
+            android:background="@color/action_bar_color"
+            >
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
