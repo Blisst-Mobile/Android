@@ -1,40 +1,38 @@
-package com.codeday.detroit.taskmanager.app.Adapters;
+package com.codeday.detroit.taskmanager.app.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.TextView;
+import com.codeday.detroit.taskmanager.app.R;
 import com.codeday.detroit.taskmanager.app.domain.Task;
-import com.codeday.detroit.taskmanager.app.domain.TaskList;
 
 import java.util.List;
 
 /**
  * Created by kevin on 5/24/14.
  */
-public class TaskListAdapter extends BaseAdapter {
+public class TaskAdapter extends BaseAdapter {
 
-    List<TaskList> taskLists;
+    List<Task> taskList;
     Context ctxt;
     LayoutInflater layoutInflater;
 
-    public TaskListAdapter(List<TaskList> t, Context c) {
-        taskLists = t;
+    public TaskAdapter(List<Task> t, Context c) {
+        taskList = t;
         ctxt = c;
         layoutInflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return taskLists.size();
+        return taskList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return taskLists.get(position);
+        return taskList.get(position);
     }
 
     @Override
@@ -44,15 +42,11 @@ public class TaskListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        //create the cell (View) and populate it with
-        //an element of the array
-        if (view == null) {
-            //convertView = myInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-            //convertView = layoutInflater.inflate(R.layout., parent, false);
-        }
+        //TODO: implement task view
 
-
+        view = layoutInflater.inflate(R.layout.adapter_task_item, parent, false);
 
         return view;
+
     }
 }
