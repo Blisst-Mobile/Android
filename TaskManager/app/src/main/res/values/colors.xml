@@ -4,5 +4,7 @@
     <color name="action_bar_color">#00A99D</color>
     <color name="app_background">#DDDDDD</color>
     <color name="white">#FFFFFF</color>
+
+    <color name="button_pressed_color">#018178</color>
     
 </resources>
