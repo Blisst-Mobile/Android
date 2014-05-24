@@ -3,6 +3,10 @@
 
     <string name="app_name">Blisst</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_search">Search</string>
+    <string name="action_add"></string>
+
+    <string name="name">Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 
 </resources>
