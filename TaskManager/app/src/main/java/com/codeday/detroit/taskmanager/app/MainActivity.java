@@ -1,18 +1,35 @@
 package com.codeday.detroit.taskmanager.app;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.codeday.detroit.taskmanager.app.ui.TaskListFragment;
 
 
 public class MainActivity extends FragmentActivity {
+
+
+    public interface MenuInteractionListener {
+        void onAddButtonPressed();
+    }
+
+    MenuInteractionListener menuInteractionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            TaskListFragment frag = TaskListFragment.getInstance();
+            menuInteractionListener = frag.getMenuInteractionListener();
+            transaction.add(R.id.container, frag, TaskListFragment.TAG);
+            transaction.commit();
+        }
     }
 
 
@@ -29,7 +46,9 @@ public class MainActivity extends FragmentActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_add) {
+            if ( menuInteractionListener != null )
+                menuInteractionListener.onAddButtonPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
