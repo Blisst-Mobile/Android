@@ -9,7 +9,7 @@
     tools:context="com.codeday.detroit.taskmanager.app.MainActivity">
 
     <FrameLayout
-            android:id="+@id/container"
+            android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
