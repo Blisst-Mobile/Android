@@ -29,6 +29,8 @@ public class TaskListFragment extends BaseFragment {
 
     private View rootView;
 
+    private boolean isInitialLoad = true;
+
     private AlertDialog dialog;
     private ListView list;
     private TaskListAdapter adapter;
@@ -43,7 +45,6 @@ public class TaskListFragment extends BaseFragment {
     }
 
     public TaskListFragment() {
-        taskLists = new ArrayList<TaskList>();
         menuInteractionListener = new MainActivity.MenuInteractionListener() {
             @Override
             public void onAddButtonPressed() {
@@ -72,6 +73,43 @@ public class TaskListFragment extends BaseFragment {
         rootView = inflater.inflate(R.layout.fragment_task_list, container, false);
 
         list = (ListView) rootView.findViewById(R.id.list);
+
+        taskLists = new ArrayList<TaskList>();
+        adapter = new TaskListAdapter(taskLists, getActivity());
+        list.setAdapter(adapter);
+
+        SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback() {
+
+            @Override
+            public SwipeDismissList.Undoable onDismiss(AbsListView listView, final int position) {
+                final TaskList taskList = taskLists.get(position);
+                taskLists.remove(position);
+                adapter.notifyDataSetChanged();
+
+                return new SwipeDismissList.Undoable() {
+
+                    //called after undo click
+                    public void undo() {
+
+                        // Return the item at its previous position again
+                        taskLists.add(position, taskList);
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    //called after toast goes away
+                    public void discard() {
+                        new DeleteListTask().execute(taskList.identifier);
+
+                    }
+
+                };
+            }
+        };
+
+        SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
+        SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode);
+        swipeList.setAutoHideDelay(10);
+
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -109,44 +147,8 @@ public class TaskListFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (taskLists == null) {
-            adapter = new TaskListAdapter(taskLists, getActivity());
-            list.setAdapter(adapter);
-
-
-            SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback() {
-
-                @Override
-                public SwipeDismissList.Undoable onDismiss(AbsListView listView, final int position) {
-                    final TaskList taskList = taskLists.get(position);
-                    taskLists.remove(position);
-                    adapter.notifyDataSetChanged();
-
-                    return new SwipeDismissList.Undoable() {
-
-                        //called after undo click
-                        public void undo() {
-
-                            // Return the item at its previous position again
-                            taskLists.add(position, taskList);
-                            adapter.notifyDataSetChanged();
-                        }
-
-                        //called after toast goes away
-                        public void discard() {
-                            new DeleteListTask().execute(taskList.identifier);
-
-                        }
-
-                    };
-                }
-            };
-
-            SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
-            SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode);
-            swipeList.setAutoHideDelay(10);
-
-
+        if ( isInitialLoad ) {
+            isInitialLoad = false;
             new RetrieveListsTask().execute();
         }
         if (dialog == null)
@@ -259,8 +261,9 @@ public class TaskListFragment extends BaseFragment {
                 return false;
             }
         }
+
         @Override
-        protected void onPostExecute(Boolean aBoolean){
+        protected void onPostExecute(Boolean aBoolean) {
 
         }
     }
