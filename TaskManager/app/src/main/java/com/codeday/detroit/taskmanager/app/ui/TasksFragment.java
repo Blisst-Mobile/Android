@@ -207,7 +207,7 @@ public class TasksFragment extends BaseFragment {
                     ObjectAnimator yearAlpha = ObjectAnimator.ofFloat(yearPicker, View.ALPHA, 0f, 1f);
                     final AnimatorSet numPickerAlpha = new AnimatorSet();
                     numPickerAlpha.playTogether(monthAlpha, dayAlpha, yearAlpha);
-                    numPickerAlpha.setDuration(defaultAnimTime * 2);
+                    numPickerAlpha.setDuration(defaultAnimTime);
                     numPickerAlpha.setInterpolator(new DecelerateInterpolator());
 
                     ObjectAnimator dateAlpha = ObjectAnimator.ofFloat(date, View.ALPHA, 1f, 0f);
