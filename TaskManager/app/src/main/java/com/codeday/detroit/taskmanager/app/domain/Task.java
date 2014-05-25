@@ -16,7 +16,7 @@ public class Task {
     public boolean isComplete;
 
     public Task() {
-
+        this.identifier = UUID.randomUUID().toString();
     }
 
     public Task(String parent, String name, boolean priority, Calendar date, boolean isComplete) {
