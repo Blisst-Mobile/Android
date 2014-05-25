@@ -33,6 +33,7 @@ import com.codeday.detroit.taskmanager.app.R;
 import com.codeday.detroit.taskmanager.app.adapters.TaskAdapter;
 import com.codeday.detroit.taskmanager.app.dao.DatabaseAccessor;
 import com.codeday.detroit.taskmanager.app.domain.Task;
+import com.codeday.detroit.taskmanager.app.domain.TaskList;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -113,6 +114,14 @@ public class TasksFragment extends BaseFragment {
         if ( tasks == null ) {
             tasks = new ArrayList<Task>();
             adapter = new TaskAdapter(tasks, getActivity());
+            adapter.setCheckChangedListener(new TaskAdapter.CheckChangedListener() {
+                @Override
+                public void OnCheckChanged(boolean isChecked, int position) {
+                    Task task = tasks.get(position);
+                    task.isComplete = isChecked;
+                    new UpdateTaskInDatabaseTask().execute(new Task[] { task });
+                }
+            });
             list.setAdapter(adapter);
             new RetrieveTasksTask().execute(parentIdentifier);
         } if ( dialog == null )
@@ -474,9 +483,14 @@ public class TasksFragment extends BaseFragment {
 
         @Override
         protected Boolean doInBackground(Task... params) {
-            if ( params != null && params.length > 0 )
-                return new DatabaseAccessor().addTask(params[0]);
-            else
+            if ( params != null && params.length > 0 ) {
+                DatabaseAccessor databaseAccessor = new DatabaseAccessor();
+                boolean result = databaseAccessor.addTask(params[0]);
+                TaskList list = databaseAccessor.getList(params[0].parent);
+                list.numberOfTasks++;
+                result = databaseAccessor.updateList(list) && result;
+                return result;
+            } else
                 return false;
         }
 
@@ -486,6 +500,28 @@ public class TasksFragment extends BaseFragment {
                 Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_list_database), Toast.LENGTH_SHORT).show();
             else
                 new RetrieveTasksTask().execute(parentIdentifier);
+        }
+    }
+
+    private class UpdateTaskInDatabaseTask extends AsyncTask<Task, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Task... params) {
+            DatabaseAccessor accessor = new DatabaseAccessor();
+            boolean result = accessor.updateTask(params[0]);
+            TaskList list = accessor.getList(params[0].parent);
+            if ( params[0].isComplete )
+                list.numberOfCompletedTasks++;
+            else
+                list.numberOfCompletedTasks--;
+            result = accessor.updateList(list) && result;
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if (!aBoolean)
+                Toast.makeText(getActivity().getApplicationContext(), "Error updating task and list", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -512,4 +548,5 @@ public class TasksFragment extends BaseFragment {
             }
         }
     }
+
 }

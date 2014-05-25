@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 
@@ -83,6 +84,16 @@ public class TaskListFragment extends BaseFragment {
     }
 
     @Override
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+        Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
+
+        if ( enter )
+            new RetrieveListsTask().execute();
+
+        return anim;
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         if ( taskLists == null ) {
@@ -128,7 +139,8 @@ public class TaskListFragment extends BaseFragment {
 
 
             new RetrieveListsTask().execute();
-        } if ( dialog == null )
+        }
+        if ( dialog == null )
             createNewListDialog();
     }
 

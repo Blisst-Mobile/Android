@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import com.codeday.detroit.taskmanager.app.R;
 import com.codeday.detroit.taskmanager.app.domain.Task;
@@ -17,6 +18,12 @@ import java.util.List;
  */
 public class TaskAdapter extends BaseAdapter {
 
+    public interface CheckChangedListener {
+        void OnCheckChanged(boolean isChecked, int position);
+    }
+
+    CheckChangedListener checkListener;
+
     List<Task> taskList;
     Context ctxt;
     LayoutInflater layoutInflater;
@@ -24,6 +31,10 @@ public class TaskAdapter extends BaseAdapter {
     public TaskAdapter(List<Task> t, Context c) {
         taskList = t;
         ctxt = c;
+    }
+
+    public void setCheckChangedListener(CheckChangedListener listener) {
+        this.checkListener = listener;
     }
 
     @Override
@@ -42,7 +53,7 @@ public class TaskAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup parent) {
+    public View getView(final int position, View view, ViewGroup parent) {
         if (layoutInflater == null)
             layoutInflater = (LayoutInflater) ctxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -53,6 +64,12 @@ public class TaskAdapter extends BaseAdapter {
 
         CheckBox checkBox = (CheckBox)view.findViewById(R.id.taskCheckbox);
         checkBox.setChecked(currentTask.isComplete);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                checkListener.OnCheckChanged(isChecked, position);
+            }
+        });
 
         return view;
 
