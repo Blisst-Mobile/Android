@@ -29,7 +29,7 @@ public class NavSortAdapter extends ArrayAdapter<String> {
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         View view = inflater.inflate(R.layout.sort_dropdown_item, parent, false);
 
-        view.setBackgroundColor(getContext().getResources().getColor(R.color.white));
+        view.setBackgroundColor(getContext().getResources().getColor(R.color.app_background));
         TextView text = (TextView) view.findViewById(R.id.text);
         text.setText(getItem(position));
         text.setTextColor(getContext().getResources().getColor(android.R.color.black));
