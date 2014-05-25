@@ -3,6 +3,31 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <!-- Customize your theme here. -->
+
+        <item name="android:actionBarStyle">@style/AppTheme.ActionBarStyle</item>
+
+    </style>
+    <style name="AppTheme.ActionBarStyle"
+           parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.TitleTextStyle</item>
+        <item name="android:background">@color/action_bar_color</item>
+
+
+    </style>
+    <style name="AppTheme.ActionBar.TitleTextStyle"
+           parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textSize">26sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="dialog_animation">
+        <item name="android:windowEnterAnimation">@anim/dialog_show_animation</item>
+        <item name="android:windowExitAnimation">@anim/dialog_hide_animation</item>
+    </style>
+
+    <style name="fade_animation">
+        <item name="@android:windowEnterAnimation">@anim/popup_show</item>
+        <item name="@android:windowExitAnimation">@anim/popup_hide</item>
     </style>
 
 </resources>

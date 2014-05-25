@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/number_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="3"
+        android:layout_margin="12dp"
+        android:visibility="gone">
+
+        <NumberPicker
+            android:id="@+id/num_picker_month"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"/>
+
+        <NumberPicker
+            android:id="@+id/num_picker_day"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp" />
+
+        <NumberPicker
+            android:id="@+id/num_picker_year"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/new_task_name"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="6dip"
+        android:layout_marginRight="6dip"
+        android:layout_marginBottom="8dip"/>
+
+    <Button
+        android:id="@+id/date"
+        style="@android:style/Widget.DeviceDefault.Light.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name"
+        android:hint="@string/date_hint"
+        android:clickable="true"
+        android:textSize="18dp"
+        android:layout_marginLeft="6dip"
+        android:layout_marginRight="6dip" />
+
+    <TextView
+        android:id="@+id/priority"
+        android:layout_below="@id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/priority"
+        android:layout_marginBottom="8dip"
+        android:layout_marginLeft="20dp"
+        android:textSize="18dp"
+        android:visibility="gone"/>
+
+    <CheckBox
+        android:id="@+id/priority_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="4dip"
+        android:layout_alignBaseline="@id/priority"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_below="@id/priority"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dip"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="match_parent"
+            android:layout_height="40dip"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_button"
+            android:clickable="true"
+            android:text="@string/cancel"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_margin="6dip"/>
+
+        <TextView
+            android:id="@+id/save"
+            android:layout_width="match_parent"
+            android:layout_height="40dip"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_button"
+            android:clickable="true"
+            android:text="@string/save"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_margin="6dip"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,18 +1,36 @@
 package com.codeday.detroit.taskmanager.app;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.codeday.detroit.taskmanager.app.ui.TaskListFragment;
 
 
 public class MainActivity extends FragmentActivity {
+
+
+    public interface MenuInteractionListener {
+        void onAddButtonPressed();
+        boolean onBackButtonPressed();
+        boolean onMenuUpPressed();
+    }
+
+    public MenuInteractionListener menuInteractionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            TaskListFragment frag = TaskListFragment.getInstance();
+            transaction.add(R.id.container, frag, TaskListFragment.TAG);
+            transaction.commit();
+        }
     }
 
 
@@ -29,10 +47,30 @@ public class MainActivity extends FragmentActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_add:
+                if ( menuInteractionListener != null )
+                    menuInteractionListener.onAddButtonPressed();
+                return true;
+            case android.R.id.home:
+                if ( menuInteractionListener.onMenuUpPressed() )
+                    return true;
+                else
+                    break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        // reduces overdraw
+        if (hasFocus)
+            getWindow().setBackgroundDrawable(null);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!menuInteractionListener.onBackButtonPressed())
+            super.onBackPressed();
+    }
 }
