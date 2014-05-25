@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.TextView;
 import com.codeday.detroit.taskmanager.app.R;
 import com.codeday.detroit.taskmanager.app.domain.Task;
 
@@ -22,7 +24,6 @@ public class TaskAdapter extends BaseAdapter {
     public TaskAdapter(List<Task> t, Context c) {
         taskList = t;
         ctxt = c;
-        layoutInflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -42,9 +43,16 @@ public class TaskAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        //TODO: implement task view
+        if (layoutInflater == null)
+            layoutInflater = (LayoutInflater) ctxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         view = layoutInflater.inflate(R.layout.adapter_task_item, parent, false);
+        Task currentTask = taskList.get(position);
+        TextView textView = (TextView) view.findViewById(R.id.taskName);
+        textView.setText(currentTask.name);
+
+        CheckBox checkBox = (CheckBox)view.findViewById(R.id.taskCheckbox);
+        checkBox.setChecked(currentTask.isComplete);
 
         return view;
 
