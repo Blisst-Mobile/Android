@@ -15,6 +15,7 @@ public class MainActivity extends FragmentActivity {
     public interface MenuInteractionListener {
         void onAddButtonPressed();
         boolean onBackButtonPressed();
+        boolean onMenuUpPressed();
     }
 
     public MenuInteractionListener menuInteractionListener;
@@ -46,10 +47,16 @@ public class MainActivity extends FragmentActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_add) {
-            if ( menuInteractionListener != null )
-                menuInteractionListener.onAddButtonPressed();
-            return true;
+        switch (id) {
+            case R.id.action_add:
+                if ( menuInteractionListener != null )
+                    menuInteractionListener.onAddButtonPressed();
+                return true;
+            case android.R.id.home:
+                if ( menuInteractionListener.onMenuUpPressed() )
+                    return true;
+                else
+                    break;
         }
         return super.onOptionsItemSelected(item);
     }

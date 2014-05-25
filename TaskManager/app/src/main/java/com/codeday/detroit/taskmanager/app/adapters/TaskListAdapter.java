@@ -81,9 +81,8 @@ public class TaskListAdapter extends BaseAdapter {
         ViewGroup.LayoutParams params = taskProgressBar.getLayoutParams();
 
 
-        if ( numberOfTasksTotal > 0 )
+        if ( numberOfTasksTotal > 0 && numberOfTasksCompleted > 0 )
             params.width = Math.round((float) screenWidth * ((float) numberOfTasksCompleted / (float) numberOfTasksTotal));
-
         else
             params.width = ctxt.getResources().getDimensionPixelOffset(R.dimen.listAdapter_min_progress);
 
