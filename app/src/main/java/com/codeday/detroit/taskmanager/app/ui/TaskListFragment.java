@@ -38,6 +38,7 @@ public class TaskListFragment extends BaseFragment {
     private List<TaskList> taskLists;
     private boolean isEditingList = false;
     private int clickedPosition = -1;
+    private SwipeDismissList swipeList;
 
     public static TaskListFragment getInstance() {
         TaskListFragment frag = new TaskListFragment();
@@ -48,7 +49,8 @@ public class TaskListFragment extends BaseFragment {
         menuInteractionListener = new MainActivity.MenuInteractionListener() {
             @Override
             public void onAddButtonPressed() {
-                CDLog.debugLog(TAG, "Add Button Pressed!");
+                if (swipeList != null)
+                    swipeList.discardUndo();
                 showNewListDialog(null);
             }
 
@@ -107,12 +109,14 @@ public class TaskListFragment extends BaseFragment {
         };
 
         SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
-        SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode, "List Deleted");
+        swipeList = new SwipeDismissList(list, callback, mode, "List Deleted");
         swipeList.setAutoHideDelay(500);
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (swipeList != null)
+                    swipeList.discardUndo();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 TasksFragment frag = TasksFragment.getInstance(taskLists.get(position).identifier);
                 transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
