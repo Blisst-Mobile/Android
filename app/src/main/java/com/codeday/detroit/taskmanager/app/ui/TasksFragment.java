@@ -5,6 +5,7 @@ package com.codeday.detroit.taskmanager.app.ui;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,18 +19,21 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codeday.detroit.taskmanager.app.CDLog;
 import com.codeday.detroit.taskmanager.app.MainActivity;
 import com.codeday.detroit.taskmanager.app.R;
+import com.codeday.detroit.taskmanager.app.adapters.NavSortAdapter;
 import com.codeday.detroit.taskmanager.app.adapters.TaskAdapter;
 import com.codeday.detroit.taskmanager.app.dao.DatabaseAccessor;
 import com.codeday.detroit.taskmanager.app.domain.Task;
@@ -37,6 +41,8 @@ import com.codeday.detroit.taskmanager.app.domain.TaskList;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -131,11 +137,42 @@ public class TasksFragment extends BaseFragment {
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
         Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
+        ActionBar actionBar = getActivity().getActionBar();
 
         if ( enter ) {
-            getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-        } else
-            getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            final ArrayList<String> sortByItems = new ArrayList<String>();
+            sortByItems.add("Date");
+            sortByItems.add("Name");
+
+            NavSortAdapter spinnerAdapter = new NavSortAdapter(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, sortByItems);
+            actionBar.setListNavigationCallbacks(spinnerAdapter, new ActionBar.OnNavigationListener() {
+                @Override
+                public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+                    switch ( itemPosition ) {
+                        case 0: // Date
+                            Collections.sort(tasks);
+                            adapter.notifyDataSetChanged();
+                            return true;
+                        case 1: // Name
+                            Collections.sort(tasks, new Comparator<Task>() {
+                                @Override
+                                public int compare(Task task1, Task task2) {
+                                    return task1.name.compareToIgnoreCase(task2.name);
+                                }
+                            });
+                            adapter.notifyDataSetChanged();
+                            return true;
+                    }
+
+                    return false;
+                }
+            });
+        } else {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+            actionBar.setDisplayHomeAsUpEnabled(false);
+        }
 
         return anim;
     }
