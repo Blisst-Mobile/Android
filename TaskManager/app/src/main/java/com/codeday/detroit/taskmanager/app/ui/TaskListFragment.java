@@ -1,5 +1,6 @@
 package com.codeday.detroit.taskmanager.app.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,7 +28,7 @@ import com.codeday.detroit.taskmanager.app.domain.TaskList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskListFragment extends Fragment {
+public class TaskListFragment extends BaseFragment {
 
     public static String TAG = "TaskListFragment";
 
@@ -37,8 +38,6 @@ public class TaskListFragment extends Fragment {
     private ListView list;
     private TaskListAdapter adapter;
     private List<TaskList> taskLists;
-
-    private MainActivity.MenuInteractionListener menuInteractionListener;
 
     public static TaskListFragment getInstance() {
         TaskListFragment frag = new TaskListFragment();
