@@ -78,7 +78,7 @@ public class TaskListAdapter extends BaseAdapter {
 
 
         if ( numberOfTasksTotal > 0 )
-            params.width = screenWidth * (numberOfTasksCompleted / numberOfTasksTotal);
+            params.width = Math.round((float) screenWidth * ((float) numberOfTasksCompleted / (float) numberOfTasksTotal));
 
         else
             params.width = ctxt.getResources().getDimensionPixelOffset(R.dimen.listAdapter_min_progress);
