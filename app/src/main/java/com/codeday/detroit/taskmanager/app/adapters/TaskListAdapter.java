@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.view.*;
 import android.widget.BaseAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.codeday.detroit.taskmanager.app.R;
 import com.codeday.detroit.taskmanager.app.domain.TaskList;
@@ -67,19 +68,10 @@ public class TaskListAdapter extends BaseAdapter {
         Point size = new Point();
         display.getSize(size);
         int screenWidth = size.x;
-        //int screenHeight = size.y;
 
         //set new width for progress bar layout
         View taskProgressBar = view.findViewById(R.id.taskProgressBar);
-
-        //rotate the line in the fraction
-        View fractionSlash = view.findViewById(R.id.separator);
-        fractionSlash.setRotation(-45);
-
-
-
         ViewGroup.LayoutParams params = taskProgressBar.getLayoutParams();
-
 
         if ( numberOfTasksTotal > 0 && numberOfTasksCompleted > 0 )
             params.width = Math.round((float) screenWidth * ((float) numberOfTasksCompleted / (float) numberOfTasksTotal));
