@@ -54,4 +54,10 @@ public class MainActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        // reduces overdraw
+        if (hasFocus)
+            getWindow().setBackgroundDrawable(null);
+    }
 }

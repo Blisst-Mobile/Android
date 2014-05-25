@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.view.*;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.codeday.detroit.taskmanager.app.R;
 import com.codeday.detroit.taskmanager.app.domain.TaskList;
@@ -23,7 +22,7 @@ public class TaskListAdapter extends BaseAdapter {
     public TaskListAdapter(List<TaskList> t, Context c) {
         taskLists = t;
         ctxt = c;
-        layoutInflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        layoutInflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -47,10 +46,13 @@ public class TaskListAdapter extends BaseAdapter {
             //view = layoutInflater.inflate(R.layout., parent, false);
         }
         //inflate view
+        if ( layoutInflater == null )
+            layoutInflater = (LayoutInflater) ctxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         view = layoutInflater.inflate(R.layout.adapter_tasklist_item, parent, false);
         TaskList currentTaskList = taskLists.get(position);
         //set list name
-        TextView textViewName = (TextView) view.findViewById(R.id.taskListItemNumber);
+        TextView textViewName = (TextView) view.findViewById(R.id.taskListItemName);
         textViewName.setText(currentTaskList.name);
         //set list task amount
         TextView textViewNumber = (TextView) view.findViewById(R.id.taskListItemNumber);
@@ -68,10 +70,19 @@ public class TaskListAdapter extends BaseAdapter {
         //int screenHeight = size.y;
 
         //set new width for progress bar layout
-        LinearLayout taskProgressBar = (LinearLayout) view.findViewById(R.id.taskProgressBar);
+        View taskProgressBar = view.findViewById(R.id.taskProgressBar);
+
+
         ViewGroup.LayoutParams params = taskProgressBar.getLayoutParams();
-        params.width = screenWidth * (numberOfTasksCompleted / numberOfTasksTotal);
-        view.setLayoutParams(params);
+
+
+        if ( numberOfTasksTotal > 0 )
+            params.width = screenWidth * (numberOfTasksCompleted / numberOfTasksTotal);
+
+        else
+            params.width = ctxt.getResources().getDimensionPixelOffset(R.dimen.listAdapter_min_progress);
+
+        taskProgressBar.requestLayout();
 
         return view;
     }
