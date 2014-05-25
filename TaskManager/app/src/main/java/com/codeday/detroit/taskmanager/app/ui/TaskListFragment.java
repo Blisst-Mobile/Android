@@ -11,11 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import com.codeday.detroit.taskmanager.app.*;
 import com.codeday.detroit.taskmanager.app.adapters.TaskListAdapter;
@@ -89,30 +85,37 @@ public class TaskListFragment extends BaseFragment {
             adapter = new TaskListAdapter(taskLists, getActivity());
             list.setAdapter(adapter);
 
-            SwipeDismissListViewTouchListener touchListener =
-                    new SwipeDismissListViewTouchListener(
-                            list,
-                            new SwipeDismissListViewTouchListener.DismissCallbacks(){
 
-                                @Override
-                                public boolean canDismiss(int position) {
-                                    return true;
-                                }
+            SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback(){
 
-                                @Override
-                                public void onDismiss(ListView listView, int[] reverseSortedPositions) {
-                                    for (int position : reverseSortedPositions){
-                                        taskLists.remove(position);
-                                        //TaskList task = taskLists.get(position);
-                                        //int test = position;
-                                    }
-                                    adapter.notifyDataSetChanged();
+                @Override
+                public SwipeDismissList.Undoable onDismiss(AbsListView listView, final int position) {
+                    final TaskList taskList = taskLists.get(position);
+                    taskLists.remove(position);
+                    adapter.notifyDataSetChanged();
 
-                                }
-                            });
-            list.setOnTouchListener(touchListener);
-            list.setOnScrollListener(touchListener.makeScrollListener());
+                    return new SwipeDismissList.Undoable() {
 
+                        //called after undo click
+                        public void undo() {
+
+                            // Return the item at its previous position again
+                            taskLists.add(position, taskList);
+                            adapter.notifyDataSetChanged();
+                        }
+                        //called after toast goes away
+                        public void discard(){
+                            new DeleteListTask().execute(taskList.identifier);
+
+                        }
+
+                    };
+                }
+            };
+
+            SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
+            SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode);
+            swipeList.setAutoHideDelay(10);
 
 
 
@@ -243,6 +246,24 @@ public class TaskListFragment extends BaseFragment {
                 adapter.notifyDataSetChanged();
                 Toast.makeText(getActivity().getApplicationContext(), "Number of lists: " + taskLists.size(), Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+    private class DeleteListTask extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            DatabaseAccessor databaseAccessor = new DatabaseAccessor();
+            boolean result = databaseAccessor.deleteList(params[0]);
+            result = databaseAccessor.deleteAllTasksForList(params[0]) && result;
+            return result;
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if (!aBoolean)
+                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_retrieving_lists), Toast.LENGTH_SHORT).show();
+
         }
     }
 }
