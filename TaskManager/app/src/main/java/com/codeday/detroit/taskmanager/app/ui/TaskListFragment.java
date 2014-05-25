@@ -6,25 +6,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
-import com.codeday.detroit.taskmanager.app.CDLog;
-import com.codeday.detroit.taskmanager.app.GlobalContext;
-import com.codeday.detroit.taskmanager.app.MainActivity;
-import com.codeday.detroit.taskmanager.app.R;
+import com.codeday.detroit.taskmanager.app.*;
 import com.codeday.detroit.taskmanager.app.adapters.TaskListAdapter;
 import com.codeday.detroit.taskmanager.app.dao.DatabaseAccessor;
+import com.codeday.detroit.taskmanager.app.domain.Task;
 import com.codeday.detroit.taskmanager.app.domain.TaskList;
 
 import java.util.ArrayList;
@@ -92,6 +84,44 @@ public class TaskListFragment extends BaseFragment {
             taskLists = new ArrayList<TaskList>();
             adapter = new TaskListAdapter(taskLists, getActivity());
             list.setAdapter(adapter);
+
+
+            SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback(){
+
+                @Override
+                public SwipeDismissList.Undoable onDismiss(AbsListView listView, final int position) {
+                    final TaskList taskList = taskLists.get(position);
+                    taskLists.remove(position);
+                    adapter.notifyDataSetChanged();
+
+                    return new SwipeDismissList.Undoable() {
+
+                        //called after undo click
+                        public void undo() {
+
+                            // Return the item at its previous position again
+                            taskLists.add(position, taskList);
+                            adapter.notifyDataSetChanged();
+                        }
+                        //called after toast goes away
+                        public void discard(){
+                            new DeleteListTask().execute(taskList.identifier);
+
+                        }
+
+                    };
+                }
+            };
+
+            SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
+            SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode);
+            swipeList.setAutoHideDelay(10);
+
+
+
+
+
+
             new RetrieveListsTask().execute();
         } if ( dialog == null )
             createNewListDialog();
@@ -216,6 +246,24 @@ public class TaskListFragment extends BaseFragment {
                 adapter.notifyDataSetChanged();
                 Toast.makeText(getActivity().getApplicationContext(), "Number of lists: " + taskLists.size(), Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+    private class DeleteListTask extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            DatabaseAccessor databaseAccessor = new DatabaseAccessor();
+            boolean result = databaseAccessor.deleteList(params[0]);
+            result = databaseAccessor.deleteAllTasksForList(params[0]) && result;
+            return result;
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if (!aBoolean)
+                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_retrieving_lists), Toast.LENGTH_SHORT).show();
+
         }
     }
 }
