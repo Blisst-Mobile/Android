@@ -94,9 +94,8 @@ public class TasksFragment extends BaseFragment {
 
             @Override
             public boolean onBackButtonPressed() {
-                if (swipeList != null){
-                    swipeList.dismissUndoToast();
-                }
+                if (swipeList != null)
+                    swipeList.discardUndo();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 TaskListFragment frag = (TaskListFragment) getActivity().getSupportFragmentManager().findFragmentByTag(TaskListFragment.TAG);
                 transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -108,9 +107,8 @@ public class TasksFragment extends BaseFragment {
 
             @Override
             public boolean onMenuUpPressed() {
-                if (swipeList != null){
-                    swipeList.dismissUndoToast();
-                }
+                if (swipeList != null)
+                    swipeList.discardUndo();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 TaskListFragment frag = (TaskListFragment) getActivity().getSupportFragmentManager().findFragmentByTag(TaskListFragment.TAG);
                 transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -564,6 +562,7 @@ public class TasksFragment extends BaseFragment {
 
                 taskNameField.setText("");
                 taskDateField.setText("");
+                chosenDate = null;
 
                 if (isDatePickerDisplayed) {
 
