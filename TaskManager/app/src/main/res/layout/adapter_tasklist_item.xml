@@ -1,45 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:weightSum="1">
 
     <LinearLayout
+        android:id="@+id/content_layout"
         android:layout_width="match_parent"
-        android:layout_height="79dp"
-        android:layout_weight="0.95"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:layout_margin="8dip">
 
         <TextView
             android:id="@+id/taskListItemName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_weight="0.95"
             android:text="List Name"
-            android:textSize="30sp" />
+            android:textSize="24dp" />
 
-        <TextView
-            android:id="@+id/taskListItemNumber"
-            android:layout_width="103dp"
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="0.05"
-            android:gravity="end"
-            android:text="X / Y"
-            android:textSize="30sp" />
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.05">
 
+            <TextView
+                android:id="@+id/completed_tasks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="X"
+                android:textSize="18dp" />
+
+            <View
+                android:id="@+id/separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dip"
+                android:layout_below="@id/completed_tasks"
+                android:layout_centerHorizontal="true"
+                android:background="@android:color/black"/>
+
+            <TextView
+                android:id="@+id/number_of_tasks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/separator"
+                android:text="Y"
+                android:textSize="18dp" />
+        </RelativeLayout>
 
     </LinearLayout>
 
     <View
         android:id="@+id/taskProgressBar"
-        android:layout_width="100dp"
+        android:layout_width="0dp"
         android:layout_height="3dp"
-        android:layout_weight="0.05"
+        android:layout_below="@id/content_layout"
         android:background="@color/action_bar_color" />
 
 
-</LinearLayout>
+</RelativeLayout>

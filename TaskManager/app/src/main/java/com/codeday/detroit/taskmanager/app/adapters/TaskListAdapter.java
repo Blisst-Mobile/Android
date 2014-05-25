@@ -55,11 +55,12 @@ public class TaskListAdapter extends BaseAdapter {
         TextView textViewName = (TextView) view.findViewById(R.id.taskListItemName);
         textViewName.setText(currentTaskList.name);
         //set list task amount
-        TextView textViewNumber = (TextView) view.findViewById(R.id.taskListItemNumber);
+        TextView completedNumber = (TextView) view.findViewById(R.id.completed_tasks);
+        TextView totalNumber = (TextView) view.findViewById(R.id.number_of_tasks);
         int numberOfTasksCompleted = currentTaskList.numberOfCompletedTasks;
         int numberOfTasksTotal = currentTaskList.numberOfTasks;
-        String remainingTasks = numberOfTasksCompleted + "/" + numberOfTasksTotal;
-        textViewNumber.setText(remainingTasks);
+        completedNumber.setText(String.valueOf(numberOfTasksCompleted));
+        totalNumber.setText(String.valueOf(numberOfTasksTotal));
 
         //get screen height and width
         WindowManager wm = (WindowManager) ctxt.getSystemService(Context.WINDOW_SERVICE);
