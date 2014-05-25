@@ -630,6 +630,7 @@ public class TasksFragment extends BaseFragment {
                     list.numberOfCompletedTasks--;
                 result = accessor.updateList(list) && result;
             }
+            isEditingTask = false;
             return result;
         }
 
