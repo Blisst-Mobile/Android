@@ -16,7 +16,7 @@ public class MainActivity extends FragmentActivity {
         void onAddButtonPressed();
     }
 
-    MenuInteractionListener menuInteractionListener;
+    public MenuInteractionListener menuInteractionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class MainActivity extends FragmentActivity {
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             TaskListFragment frag = TaskListFragment.getInstance();
-            menuInteractionListener = frag.getMenuInteractionListener();
+//            menuInteractionListener = frag.getMenuInteractionListener();
             transaction.add(R.id.container, frag, TaskListFragment.TAG);
             transaction.commit();
         }
