@@ -22,7 +22,6 @@ public class TaskListAdapter extends BaseAdapter {
     public TaskListAdapter(List<TaskList> t, Context c) {
         taskLists = t;
         ctxt = c;
-//        layoutInflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
