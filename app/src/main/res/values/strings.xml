@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Blisst</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_add"></string>
+    <string name="new_list_name">Name of List</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="list_name_not_valid">That is not a valid name for a list!</string>
+    <string name="error_list_database">Error adding list to database</string>
+    <string name="error_retrieving_lists">Error retrieving lists from database</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="undo">Undo</string>
+    <string name="undoall">Undo All</string>
+    <string name="task_name_not_valid">That is not a valid name for a task!</string>
+    <string name="error_retrieving_tasks">Error retrieving tasks from database</string>
+    <string name="new_task_name">Name of task</string>
+    <string name="date_hint">Date</string>
+    <string name="priority">Priority?</string>
+    <string name="set">Set</string>
+    <string name="task_date_not_valid">That is not a valid date for a task!</string>
+
+</resources>

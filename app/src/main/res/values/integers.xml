@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="default_anim_time">300</integer>
+    <integer name="dialog_anim_time">500</integer>
+    <integer name="sliding_anim_time">250</integer>
+
+</resources>
