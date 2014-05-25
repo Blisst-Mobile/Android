@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Created by timothymiko on 5/24/14.
  */
-public class TaskList {
+public class TaskList implements Comparable<TaskList> {
 
     public String identifier;
     public String name;
@@ -31,5 +31,10 @@ public class TaskList {
         this.numberOfTasks = numberOfTasks;
         this.numberOfCompletedTasks = numberOfCompletedTasks;
         this.isComplete = isComplete;
+    }
+
+    @Override
+    public int compareTo(TaskList taskList) {
+        return this.name.compareToIgnoreCase(taskList.name);
     }
 }

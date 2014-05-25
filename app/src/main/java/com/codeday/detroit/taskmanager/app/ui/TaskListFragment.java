@@ -29,10 +29,15 @@ public class TaskListFragment extends BaseFragment {
 
     private View rootView;
 
+    private boolean isInitialLoad = true;
+
     private AlertDialog dialog;
     private ListView list;
     private TaskListAdapter adapter;
+    private EditText listName;
     private List<TaskList> taskLists;
+    private boolean isEditingList = false;
+    private int clickedPosition = -1;
 
     public static TaskListFragment getInstance() {
         TaskListFragment frag = new TaskListFragment();
@@ -44,7 +49,7 @@ public class TaskListFragment extends BaseFragment {
             @Override
             public void onAddButtonPressed() {
                 CDLog.debugLog(TAG, "Add Button Pressed!");
-                showNewListDialog();
+                showNewListDialog(null);
             }
 
             @Override
@@ -68,6 +73,43 @@ public class TaskListFragment extends BaseFragment {
         rootView = inflater.inflate(R.layout.fragment_task_list, container, false);
 
         list = (ListView) rootView.findViewById(R.id.list);
+
+        taskLists = new ArrayList<TaskList>();
+        adapter = new TaskListAdapter(taskLists, getActivity());
+        list.setAdapter(adapter);
+
+        SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback() {
+
+            @Override
+            public SwipeDismissList.Undoable onDismiss(AbsListView listView, final int position) {
+                final TaskList taskList = taskLists.get(position);
+                taskLists.remove(position);
+                adapter.notifyDataSetChanged();
+
+                return new SwipeDismissList.Undoable() {
+
+                    //called after undo click
+                    public void undo() {
+
+                        // Return the item at its previous position again
+                        taskLists.add(position, taskList);
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    //called after toast goes away
+                    public void discard() {
+                        new DeleteListTask().execute(new String[]{taskList.identifier});
+
+                    }
+
+                };
+            }
+        };
+
+        SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
+        SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode, "List Deleted");
+        swipeList.setAutoHideDelay(500);
+
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -79,6 +121,15 @@ public class TaskListFragment extends BaseFragment {
                 transaction.commit();
             }
         });
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                isEditingList = true;
+                clickedPosition = position;
+                showNewListDialog(taskLists.get(position).name);
+                return true;
+            }
+        });
 
         return rootView;
     }
@@ -87,7 +138,7 @@ public class TaskListFragment extends BaseFragment {
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
         Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
 
-        if ( enter )
+        if (enter)
             new RetrieveListsTask().execute();
 
         return anim;
@@ -96,51 +147,12 @@ public class TaskListFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if ( taskLists == null ) {
-            taskLists = new ArrayList<TaskList>();
-            adapter = new TaskListAdapter(taskLists, getActivity());
-            list.setAdapter(adapter);
 
-
-            SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback(){
-
-                @Override
-                public SwipeDismissList.Undoable onDismiss(AbsListView listView, final int position) {
-                    final TaskList taskList = taskLists.get(position);
-                    taskLists.remove(position);
-                    adapter.notifyDataSetChanged();
-
-                    return new SwipeDismissList.Undoable() {
-
-                        //called after undo click
-                        public void undo() {
-
-                            // Return the item at its previous position again
-                            taskLists.add(position, taskList);
-                            adapter.notifyDataSetChanged();
-                        }
-                        //called after toast goes away
-                        public void discard(){
-                            new DeleteListTask().execute(taskList.identifier);
-
-                        }
-
-                    };
-                }
-            };
-
-            SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
-            SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode);
-            swipeList.setAutoHideDelay(10);
-
-
-
-
-
-
+        if ( isInitialLoad ) {
+            isInitialLoad = false;
             new RetrieveListsTask().execute();
         }
-        if ( dialog == null )
+        if (dialog == null)
             createNewListDialog();
     }
 
@@ -153,7 +165,7 @@ public class TaskListFragment extends BaseFragment {
         AlertDialog.Builder builder;
         View layout = getActivity().getLayoutInflater().inflate(R.layout.dialog_new_list, null);
 
-        final EditText listName = (EditText) layout.findViewById(R.id.name);
+        listName = (EditText) layout.findViewById(R.id.name);
         final TextView cancelButton = (TextView) layout.findViewById(R.id.cancel);
         final TextView saveButton = (TextView) layout.findViewById(R.id.save);
 
@@ -171,27 +183,39 @@ public class TaskListFragment extends BaseFragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String name = listName.getText().toString();
-
-                if ( name != null && name.length() > 0 ) {
-                    InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (inputMethodManager != null) {
-                        inputMethodManager.hideSoftInputFromWindow(listName.getWindowToken(), 0);
+                if (isEditingList) {
+                    //edit shit here
+                    if (name != null && name.length() > 0) {
+                        TaskList taskList = taskLists.get(clickedPosition);
+                        taskList.name = name;
+                        new UpdateListNameTask().execute(taskList);
+                        isEditingList = false;
+                        clickedPosition = -1;
                     }
-                    dialog.dismiss();
-
-                    TaskList taskList = new TaskList();
-                    taskList.name = name;
-                    taskList.numberOfTasks = 0;
-                    taskList.numberOfCompletedTasks = 0;
-                    taskList.isComplete = false;
-
-                    new AddListToDatabaseTask().execute(new TaskList[] { taskList });
 
                 } else {
-                    Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.list_name_not_valid), Toast.LENGTH_SHORT).show();
+                    if (name != null && name.length() > 0) {
+
+
+                        TaskList taskList = new TaskList();
+                        taskList.name = name;
+                        taskList.numberOfTasks = 0;
+                        taskList.numberOfCompletedTasks = 0;
+                        taskList.isComplete = false;
+
+                        new AddListToDatabaseTask().execute(new TaskList[]{taskList});
+
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.list_name_not_valid), Toast.LENGTH_SHORT).show();
+                    }
+
                 }
+                InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (inputMethodManager != null) {
+                    inputMethodManager.hideSoftInputFromWindow(listName.getWindowToken(), 0);
+                }
+                dialog.dismiss();
             }
         });
 
@@ -216,9 +240,32 @@ public class TaskListFragment extends BaseFragment {
         });
     }
 
-    private void showNewListDialog() {
-        if ( dialog != null ) {
+    private void showNewListDialog(String listName) {
+        if (dialog != null) {
+            if (listName != null) {
+                this.listName.setText(listName);
+
+            } else {
+                this.listName.setText("");
+            }
             dialog.show();
+        }
+    }
+
+    private class UpdateListNameTask extends AsyncTask<TaskList, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(TaskList... params) {
+            if (params.length > 0) {
+                return new DatabaseAccessor().updateList(params[0]);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+
         }
     }
 
@@ -226,7 +273,7 @@ public class TaskListFragment extends BaseFragment {
 
         @Override
         protected Boolean doInBackground(TaskList... params) {
-            if ( params.length > 0 )
+            if (params.length > 0)
                 return new DatabaseAccessor().addList(params[0]);
             else
                 return false;
@@ -234,10 +281,7 @@ public class TaskListFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_list_database), Toast.LENGTH_SHORT).show();
-            else
-                new RetrieveListsTask().execute();
+            if (aBoolean) new RetrieveListsTask().execute();
         }
     }
 
@@ -247,7 +291,7 @@ public class TaskListFragment extends BaseFragment {
         protected Boolean doInBackground(Void... params) {
             taskLists.clear();
             List<TaskList> result = new DatabaseAccessor().getAllLists();
-            if ( result != null ) {
+            if (result != null) {
                 taskLists.addAll(result);
                 return true;
             } else {
@@ -257,14 +301,10 @@ public class TaskListFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_retrieving_lists), Toast.LENGTH_SHORT).show();
-            else {
-                adapter.notifyDataSetChanged();
-                Toast.makeText(getActivity().getApplicationContext(), "Number of lists: " + taskLists.size(), Toast.LENGTH_SHORT).show();
-            }
+            if (aBoolean) adapter.notifyDataSetChanged();
         }
     }
+
     private class DeleteListTask extends AsyncTask<String, Void, Boolean> {
 
         @Override
@@ -273,13 +313,6 @@ public class TaskListFragment extends BaseFragment {
             boolean result = databaseAccessor.deleteList(params[0]);
             result = databaseAccessor.deleteAllTasksForList(params[0]) && result;
             return result;
-
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_retrieving_lists), Toast.LENGTH_SHORT).show();
 
         }
     }
