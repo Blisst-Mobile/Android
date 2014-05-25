@@ -1,7 +1,6 @@
 package com.codeday.detroit.taskmanager.app.ui;
 
 
-
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -56,7 +55,6 @@ import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
- *
  */
 public class TasksFragment extends BaseFragment {
 
@@ -120,13 +118,13 @@ public class TasksFragment extends BaseFragment {
 
         list = (ListView) rootView.findViewById(R.id.list);
 
-        return  rootView;
+        return rootView;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if ( tasks == null ) {
+        if (tasks == null) {
 
             tasks = new ArrayList<Task>();
             adapter = new TaskAdapter(tasks, getActivity());
@@ -135,12 +133,12 @@ public class TasksFragment extends BaseFragment {
                 public void OnCheckChanged(boolean isChecked, int position) {
                     Task task = tasks.get(position);
                     task.isComplete = isChecked;
-                    new UpdateTaskInDatabaseTask().execute(new Task[] { task });
+                    new UpdateTaskInDatabaseTask().execute(new Task[]{task});
                 }
             });
             list.setAdapter(adapter);
 
-            SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback(){
+            SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback() {
 
                 @Override
                 public SwipeDismissList.Undoable onDismiss(AbsListView listView, final int position) {
@@ -148,7 +146,7 @@ public class TasksFragment extends BaseFragment {
                     tasks.remove(position);
                     adapter.notifyDataSetChanged();
 
-                    return new SwipeDismissList.Undoable(){
+                    return new SwipeDismissList.Undoable() {
 
                         //called after undo click
                         public void undo() {
@@ -157,34 +155,26 @@ public class TasksFragment extends BaseFragment {
                         }
 
                         //called after toast goes away
-                        public void discard(){
-                            new RetrieveListTask().execute(task.parent);
-                            if (taskList != null){
-                                if (task.isComplete){
-                                    taskList.numberOfCompletedTasks -= 1;
-                                }
-                                taskList.numberOfTasks -= 1;
+                        public void discard() {
 
-                                new UpdateListTask().execute(taskList);
-                                new DeleteTask().execute(task.identifier);
-                            }
-
+                            new DeleteTask().execute(new Task[]{task});
                         }
+
+
                     };
 
                 }
             };
 
             SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
-            SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode);
-
-
-
+            SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode, "Task Deleted");
+           // swipeList.setAutoHideDelay(11000);
 
 
 
             new RetrieveTasksTask().execute(parentIdentifier);
-        } if ( dialog == null )
+        }
+        if (dialog == null)
             createNewTaskDialog();
     }
 
@@ -193,7 +183,7 @@ public class TasksFragment extends BaseFragment {
         Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
         ActionBar actionBar = getActivity().getActionBar();
 
-        if ( enter ) {
+        if (enter) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
             final ArrayList<String> sortByItems = new ArrayList<String>();
@@ -204,7 +194,7 @@ public class TasksFragment extends BaseFragment {
             actionBar.setListNavigationCallbacks(spinnerAdapter, new ActionBar.OnNavigationListener() {
                 @Override
                 public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-                    switch ( itemPosition ) {
+                    switch (itemPosition) {
                         case 0: // Date
                             Collections.sort(tasks);
                             adapter.notifyDataSetChanged();
@@ -252,7 +242,7 @@ public class TasksFragment extends BaseFragment {
         monthPicker.setMaxValue(today.getActualMaximum(Calendar.MONTH));
         int thisMonth = today.get(Calendar.MONTH);
         String[] displayValues = new String[12];
-        for ( int i = 0; i < 12; i++ ) {
+        for (int i = 0; i < 12; i++) {
             today.set(Calendar.MONTH, i);
             displayValues[i] = today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US);
         }
@@ -362,7 +352,7 @@ public class TasksFragment extends BaseFragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if ( isDatePickerDisplayed ) {
+                if (isDatePickerDisplayed) {
 
                     isDatePickerDisplayed = false;
 
@@ -428,7 +418,7 @@ public class TasksFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
 
-                if ( isDatePickerDisplayed ) {
+                if (isDatePickerDisplayed) {
 
                     int month = monthPicker.getValue();
                     int day = dayPicker.getValue();
@@ -443,7 +433,7 @@ public class TasksFragment extends BaseFragment {
                     chosenDate.set(Calendar.MILLISECOND, 0);
 
                     today.set(Calendar.MONTH, month);
-                    date.setText("  " + today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) +" " + day + ", " + year);
+                    date.setText("  " + today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) + " " + day + ", " + year);
                     isDatePickerDisplayed = false;
 
                     saveButton.setText(getResources().getString(R.string.save));
@@ -499,7 +489,7 @@ public class TasksFragment extends BaseFragment {
 
                     if (name != null && name.length() > 0) {
 
-                        if ( chosenDate != null ) {
+                        if (chosenDate != null) {
                             InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                             if (inputMethodManager != null) {
                                 inputMethodManager.hideSoftInputFromWindow(taskName.getWindowToken(), 0);
@@ -543,7 +533,7 @@ public class TasksFragment extends BaseFragment {
                 taskName.setText("");
                 date.setText("");
 
-                if ( isDatePickerDisplayed ) {
+                if (isDatePickerDisplayed) {
 
                     isDatePickerDisplayed = false;
 
@@ -565,7 +555,7 @@ public class TasksFragment extends BaseFragment {
     }
 
     private void showNewTaskDialog() {
-        if ( dialog != null ) {
+        if (dialog != null) {
             dialog.show();
         }
     }
@@ -574,7 +564,7 @@ public class TasksFragment extends BaseFragment {
 
         @Override
         protected Boolean doInBackground(Task... params) {
-            if ( params != null && params.length > 0 ) {
+            if (params != null && params.length > 0) {
                 DatabaseAccessor databaseAccessor = new DatabaseAccessor();
                 boolean result = databaseAccessor.addTask(params[0]);
                 TaskList list = databaseAccessor.getList(params[0].parent);
@@ -598,7 +588,7 @@ public class TasksFragment extends BaseFragment {
             DatabaseAccessor accessor = new DatabaseAccessor();
             boolean result = accessor.updateTask(params[0]);
             TaskList list = accessor.getList(params[0].parent);
-            if ( params[0].isComplete )
+            if (params[0].isComplete)
                 list.numberOfCompletedTasks++;
             else
                 list.numberOfCompletedTasks--;
@@ -613,7 +603,7 @@ public class TasksFragment extends BaseFragment {
         protected Boolean doInBackground(String... params) {
             tasks.clear();
             List<Task> result = new DatabaseAccessor().getTasksForList(params[0]);
-            if ( result != null ) {
+            if (result != null) {
                 tasks.addAll(result);
                 return true;
             } else
@@ -626,14 +616,16 @@ public class TasksFragment extends BaseFragment {
         }
     }
 
-    private class DeleteTask extends AsyncTask<String, Void, Boolean>{
+    private class DeleteTask extends AsyncTask<Task, Void, Boolean> {
         @Override
-        protected Boolean doInBackground(String... params) {
+        protected Boolean doInBackground(Task... params) {
             DatabaseAccessor databaseAccessor = new DatabaseAccessor();
-            boolean result = databaseAccessor.deleteTask(params[0]);
-            result = databaseAccessor.deleteTask(params[0]) && result;
-
-            //subtracting shit
+            boolean result = databaseAccessor.deleteTask(params[0].identifier);
+            TaskList list = databaseAccessor.getList(params[0].parent);
+            if (params[0].isComplete)
+                list.numberOfCompletedTasks--;
+            list.numberOfTasks--;
+            result = databaseAccessor.updateList(list) && result;
 
             return result;
         }
@@ -649,21 +641,10 @@ public class TasksFragment extends BaseFragment {
                 return false;
             }
         }
-        @Override
-        protected void onPostExecute(Boolean aBoolean){
 
-        }
-    }
-
-    private class RetrieveListTask extends AsyncTask<String, Void, Boolean> {
         @Override
-        protected Boolean doInBackground(String... params) {
-            DatabaseAccessor databaseAccessor = new DatabaseAccessor();
-            taskList = databaseAccessor.getList(params[0])
-            if (taskList != null)
-                return true;
-            else
-                return false;
+        protected void onPostExecute(Boolean aBoolean) {
+
         }
     }
 

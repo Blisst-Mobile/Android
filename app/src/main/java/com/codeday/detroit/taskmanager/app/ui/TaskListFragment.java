@@ -98,7 +98,7 @@ public class TaskListFragment extends BaseFragment {
 
                     //called after toast goes away
                     public void discard() {
-                        new DeleteListTask().execute(taskList.identifier);
+                        new DeleteListTask().execute(new String[]{taskList.identifier});
 
                     }
 
@@ -107,7 +107,7 @@ public class TaskListFragment extends BaseFragment {
         };
 
         SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
-        SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode);
+        SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode, "List Deleted");
         swipeList.setAutoHideDelay(10);
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
