@@ -43,6 +43,7 @@ public class TaskListFragment extends BaseFragment {
     }
 
     public TaskListFragment() {
+        taskLists = new ArrayList<TaskList>();
         menuInteractionListener = new MainActivity.MenuInteractionListener() {
             @Override
             public void onAddButtonPressed() {
@@ -109,7 +110,6 @@ public class TaskListFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         if (taskLists == null) {
-            taskLists = new ArrayList<TaskList>();
             adapter = new TaskListAdapter(taskLists, getActivity());
             list.setAdapter(adapter);
 
