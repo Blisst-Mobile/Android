@@ -20,13 +20,13 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 
 import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,6 +72,11 @@ public class TasksFragment extends BaseFragment {
     private List<Task> tasks;
     private TaskList taskList;
 
+    private EditText taskNameField;
+    private Button taskDateField;
+    private boolean isEditingTask;
+    private int clickedPosition;
+
     public static TasksFragment getInstance(String identifier) {
         TasksFragment frag = new TasksFragment();
         frag.parentIdentifier = identifier;
@@ -83,7 +88,7 @@ public class TasksFragment extends BaseFragment {
             @Override
             public void onAddButtonPressed() {
                 CDLog.debugLog(TAG, "Add Button Pressed!");
-                showNewTaskDialog();
+                showNewTaskDialog(null, null);
             }
 
             @Override
@@ -172,6 +177,16 @@ public class TasksFragment extends BaseFragment {
 
 
 
+            list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    isEditingTask = true;
+                    clickedPosition = position;
+                    Task task = tasks.get(position);
+                    showNewTaskDialog(task.name, task.date);
+                    return true;
+                }
+            });
             new RetrieveTasksTask().execute(parentIdentifier);
         }
         if (dialog == null)
@@ -225,8 +240,8 @@ public class TasksFragment extends BaseFragment {
         AlertDialog.Builder builder;
         View layout = getActivity().getLayoutInflater().inflate(R.layout.dialog_new_task, null);
 
-        final EditText taskName = (EditText) layout.findViewById(R.id.name);
-        final Button date = (Button) layout.findViewById(R.id.date);
+        taskNameField = (EditText) layout.findViewById(R.id.name);
+        taskDateField  = (Button) layout.findViewById(R.id.date);
         final LinearLayout buttonLayout = (LinearLayout) layout.findViewById(R.id.button_layout);
         final TextView cancelButton = (TextView) layout.findViewById(R.id.cancel);
         final TextView saveButton = (TextView) layout.findViewById(R.id.save);
@@ -271,8 +286,8 @@ public class TasksFragment extends BaseFragment {
         yearPicker.setWrapSelectorWheel(false);
         yearPicker.setValue(today.get(Calendar.YEAR));
 
-        date.setHint("  " + getResources().getString(R.string.date_hint));
-        date.setOnClickListener(new View.OnClickListener() {
+        taskDateField.setHint("  " + getResources().getString(R.string.date_hint));
+        taskDateField.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -291,8 +306,8 @@ public class TasksFragment extends BaseFragment {
                     numPickerAlpha.setDuration(defaultAnimTime);
                     numPickerAlpha.setInterpolator(new DecelerateInterpolator());
 
-                    ObjectAnimator dateAlpha = ObjectAnimator.ofFloat(date, View.ALPHA, 1f, 0f);
-                    ObjectAnimator taskAlpha = ObjectAnimator.ofFloat(taskName, View.ALPHA, 1f, 0f);
+                    ObjectAnimator dateAlpha = ObjectAnimator.ofFloat(taskDateField, View.ALPHA, 1f, 0f);
+                    ObjectAnimator taskAlpha = ObjectAnimator.ofFloat(taskNameField, View.ALPHA, 1f, 0f);
 
                     AnimatorSet set = new AnimatorSet();
                     set.playTogether(dateAlpha, taskAlpha);
@@ -360,8 +375,8 @@ public class TasksFragment extends BaseFragment {
 
                     int defaultAnimTime = getResources().getInteger(R.integer.default_anim_time);
 
-                    ObjectAnimator dateAlpha = ObjectAnimator.ofFloat(date, View.ALPHA, 0f, 1f);
-                    ObjectAnimator taskAlpha = ObjectAnimator.ofFloat(taskName, View.ALPHA, 0f, 1f);
+                    ObjectAnimator dateAlpha = ObjectAnimator.ofFloat(taskDateField, View.ALPHA, 0f, 1f);
+                    ObjectAnimator taskAlpha = ObjectAnimator.ofFloat(taskNameField, View.ALPHA, 0f, 1f);
 
                     final AnimatorSet dateTaskSet = new AnimatorSet();
                     dateTaskSet.playTogether(dateAlpha, taskAlpha);
@@ -387,7 +402,7 @@ public class TasksFragment extends BaseFragment {
                         public void onAnimationEnd(Animator animation) {
                             numberPickerLayout.setVisibility(View.GONE);
                             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) buttonLayout.getLayoutParams();
-                            lp.addRule(RelativeLayout.BELOW, date.getId());
+                            lp.addRule(RelativeLayout.BELOW, taskDateField.getId());
                             buttonLayout.requestLayout();
                             dateTaskSet.start();
                         }
@@ -407,7 +422,7 @@ public class TasksFragment extends BaseFragment {
                 } else {
                     InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     if (inputMethodManager != null) {
-                        inputMethodManager.hideSoftInputFromWindow(taskName.getWindowToken(), 0);
+                        inputMethodManager.hideSoftInputFromWindow(taskNameField.getWindowToken(), 0);
                     }
                     dialog.dismiss();
                 }
@@ -433,15 +448,15 @@ public class TasksFragment extends BaseFragment {
                     chosenDate.set(Calendar.MILLISECOND, 0);
 
                     today.set(Calendar.MONTH, month);
-                    date.setText("  " + today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) + " " + day + ", " + year);
+                    taskDateField.setText("  " + today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) +" " + day + ", " + year);
                     isDatePickerDisplayed = false;
 
                     saveButton.setText(getResources().getString(R.string.save));
 
                     int defaultAnimTime = getResources().getInteger(R.integer.default_anim_time);
 
-                    ObjectAnimator dateAlpha = ObjectAnimator.ofFloat(date, View.ALPHA, 0f, 1f);
-                    ObjectAnimator taskAlpha = ObjectAnimator.ofFloat(taskName, View.ALPHA, 0f, 1f);
+                    ObjectAnimator dateAlpha = ObjectAnimator.ofFloat(taskDateField, View.ALPHA, 0f, 1f);
+                    ObjectAnimator taskAlpha = ObjectAnimator.ofFloat(taskNameField, View.ALPHA, 0f, 1f);
 
                     final AnimatorSet dateTaskSet = new AnimatorSet();
                     dateTaskSet.playTogether(dateAlpha, taskAlpha);
@@ -467,7 +482,7 @@ public class TasksFragment extends BaseFragment {
                         public void onAnimationEnd(Animator animation) {
                             numberPickerLayout.setVisibility(View.GONE);
                             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) buttonLayout.getLayoutParams();
-                            lp.addRule(RelativeLayout.BELOW, date.getId());
+                            lp.addRule(RelativeLayout.BELOW, taskDateField.getId());
                             buttonLayout.requestLayout();
                             dateTaskSet.start();
                         }
@@ -485,23 +500,33 @@ public class TasksFragment extends BaseFragment {
                     numPickerAlpha.start();
 
                 } else {
-                    String name = taskName.getText().toString();
+                    String name = taskNameField.getText().toString();
 
                     if (name != null && name.length() > 0) {
 
                         if (chosenDate != null) {
                             InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                             if (inputMethodManager != null) {
-                                inputMethodManager.hideSoftInputFromWindow(taskName.getWindowToken(), 0);
+                                inputMethodManager.hideSoftInputFromWindow(taskNameField.getWindowToken(), 0);
                             }
                             dialog.dismiss();
 
-                            Task task = new Task();
-                            task.name = name;
-                            task.date = chosenDate;
-                            task.parent = parentIdentifier;
+                            if ( isEditingTask ) {
 
-                            new AddTaskToDatabaseTask().execute(new Task[]{task});
+                                Task task = tasks.get(clickedPosition);
+                                task.name = name;
+                                task.date = chosenDate;
+
+                                new UpdateTaskInDatabaseTask().execute(task);
+
+                            } else {
+                                Task task = new Task();
+                                task.name = name;
+                                task.date = chosenDate;
+                                task.parent = parentIdentifier;
+
+                                new AddTaskToDatabaseTask().execute(new Task[]{task});
+                            }
                         } else {
                             Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.task_date_not_valid), Toast.LENGTH_SHORT).show();
                         }
@@ -522,7 +547,7 @@ public class TasksFragment extends BaseFragment {
             public void onShow(DialogInterface dialog) {
                 InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager != null) {
-                    inputMethodManager.showSoftInput(taskName, InputMethodManager.SHOW_IMPLICIT);
+                    inputMethodManager.showSoftInput(taskNameField, InputMethodManager.SHOW_IMPLICIT);
                 }
             }
         });
@@ -530,8 +555,8 @@ public class TasksFragment extends BaseFragment {
             @Override
             public void onDismiss(DialogInterface dialog) {
 
-                taskName.setText("");
-                date.setText("");
+                taskNameField.setText("");
+                taskDateField.setText("");
 
                 if (isDatePickerDisplayed) {
 
@@ -539,11 +564,11 @@ public class TasksFragment extends BaseFragment {
 
                     numberPickerLayout.setVisibility(View.GONE);
                     RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) buttonLayout.getLayoutParams();
-                    lp.addRule(RelativeLayout.BELOW, date.getId());
+                    lp.addRule(RelativeLayout.BELOW, taskDateField.getId());
                     buttonLayout.requestLayout();
 
-                    taskName.setAlpha(1.0f);
-                    date.setAlpha(1.0f);
+                    taskNameField.setAlpha(1.0f);
+                    taskDateField.setAlpha(1.0f);
                 }
 
                 Calendar today = Calendar.getInstance();
@@ -554,8 +579,18 @@ public class TasksFragment extends BaseFragment {
         });
     }
 
-    private void showNewTaskDialog() {
-        if (dialog != null) {
+    private void showNewTaskDialog(String name, Calendar date) {
+        if ( dialog != null ) {
+
+            if ( name != null && date != null ) {
+                taskNameField.setText(name);
+                taskDateField.setText("  " + date.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) + " " + date.get(Calendar.DAY_OF_MONTH) + ", " + date.get(Calendar.YEAR));
+                if ( chosenDate == null ) {
+                    chosenDate = Calendar.getInstance();
+                    chosenDate.setTime(date.getTime());
+                }
+            }
+
             dialog.show();
         }
     }
@@ -587,13 +622,21 @@ public class TasksFragment extends BaseFragment {
         protected Boolean doInBackground(Task... params) {
             DatabaseAccessor accessor = new DatabaseAccessor();
             boolean result = accessor.updateTask(params[0]);
-            TaskList list = accessor.getList(params[0].parent);
-            if (params[0].isComplete)
-                list.numberOfCompletedTasks++;
-            else
-                list.numberOfCompletedTasks--;
-            result = accessor.updateList(list) && result;
+            if ( !isEditingTask) {
+                TaskList list = accessor.getList(params[0].parent);
+                if (params[0].isComplete)
+                    list.numberOfCompletedTasks++;
+                else
+                    list.numberOfCompletedTasks--;
+                result = accessor.updateList(list) && result;
+            }
             return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if ( aBoolean && isEditingTask )
+                new RetrieveTasksTask().execute(parentIdentifier);
         }
     }
 
