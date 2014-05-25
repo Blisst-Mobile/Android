@@ -14,6 +14,7 @@ public class MainActivity extends FragmentActivity {
 
     public interface MenuInteractionListener {
         void onAddButtonPressed();
+        boolean onBackButtonPressed();
     }
 
     public MenuInteractionListener menuInteractionListener;
@@ -26,7 +27,6 @@ public class MainActivity extends FragmentActivity {
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             TaskListFragment frag = TaskListFragment.getInstance();
-//            menuInteractionListener = frag.getMenuInteractionListener();
             transaction.add(R.id.container, frag, TaskListFragment.TAG);
             transaction.commit();
         }
@@ -59,5 +59,11 @@ public class MainActivity extends FragmentActivity {
         // reduces overdraw
         if (hasFocus)
             getWindow().setBackgroundDrawable(null);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!menuInteractionListener.onBackButtonPressed())
+            super.onBackPressed();
     }
 }

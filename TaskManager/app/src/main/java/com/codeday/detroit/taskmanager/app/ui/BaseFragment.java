@@ -1,8 +1,8 @@
 package com.codeday.detroit.taskmanager.app.ui;
 
 
-import android.app.Activity;
 import android.support.v4.app.Fragment;
+import android.view.animation.Animation;
 
 import com.codeday.detroit.taskmanager.app.MainActivity;
 
@@ -14,8 +14,12 @@ public class BaseFragment extends Fragment {
     MainActivity.MenuInteractionListener menuInteractionListener;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        ((MainActivity) activity).menuInteractionListener = menuInteractionListener;
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+        Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
+
+        if (enter)
+            ((MainActivity) getActivity()).menuInteractionListener = menuInteractionListener;
+
+        return anim;
     }
 }

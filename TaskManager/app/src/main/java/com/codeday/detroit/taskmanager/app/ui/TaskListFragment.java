@@ -8,10 +8,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -51,6 +53,11 @@ public class TaskListFragment extends BaseFragment {
                 CDLog.debugLog(TAG, "Add Button Pressed!");
                 showNewListDialog();
             }
+
+            @Override
+            public boolean onBackButtonPressed() {
+                return false;
+            }
         };
     }
 
@@ -63,6 +70,17 @@ public class TaskListFragment extends BaseFragment {
         rootView = inflater.inflate(R.layout.fragment_task_list, container, false);
 
         list = (ListView) rootView.findViewById(R.id.list);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                TasksFragment frag = TasksFragment.getInstance(taskLists.get(position).identifier);
+                transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+                transaction.hide(TaskListFragment.this);
+                transaction.add(R.id.container, frag, TasksFragment.TAG);
+                transaction.commit();
+            }
+        });
 
         return rootView;
     }
