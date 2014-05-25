@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -81,6 +82,17 @@ public class TasksFragment extends BaseFragment {
                 transaction.commit();
                 return true;
             }
+
+            @Override
+            public boolean onMenuUpPressed() {
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                TaskListFragment frag = (TaskListFragment) getActivity().getSupportFragmentManager().findFragmentByTag(TaskListFragment.TAG);
+                transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+                transaction.remove(TasksFragment.this);
+                transaction.show(frag);
+                transaction.commit();
+                return true;
+            }
         };
     }
 
@@ -105,6 +117,18 @@ public class TasksFragment extends BaseFragment {
             new RetrieveTasksTask().execute(parentIdentifier);
         } if ( dialog == null )
             createNewTaskDialog();
+    }
+
+    @Override
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+        Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
+
+        if ( enter ) {
+            getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+        } else
+            getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+
+        return anim;
     }
 
     public void createNewTaskDialog() {

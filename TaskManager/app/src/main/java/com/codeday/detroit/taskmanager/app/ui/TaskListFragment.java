@@ -50,6 +50,11 @@ public class TaskListFragment extends BaseFragment {
             public boolean onBackButtonPressed() {
                 return false;
             }
+
+            @Override
+            public boolean onMenuUpPressed() {
+                return false;
+            }
         };
     }
 
