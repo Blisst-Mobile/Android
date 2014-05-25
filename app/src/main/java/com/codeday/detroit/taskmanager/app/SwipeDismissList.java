@@ -212,8 +212,8 @@ public final class SwipeDismissList implements View.OnTouchListener {
 	 * @param callback The callback to trigger when the user has indicated that
 	 * she would like to dismiss one or more list items.
 	 */
-	public SwipeDismissList(AbsListView listView, OnDismissCallback callback) {
-		this(listView, callback, UndoMode.SINGLE_UNDO);
+	public SwipeDismissList(AbsListView listView, OnDismissCallback callback, String message) {
+		this(listView, callback, UndoMode.SINGLE_UNDO, message);
 	}
 
 	/**
@@ -224,11 +224,13 @@ public final class SwipeDismissList implements View.OnTouchListener {
 	 * she would like to dismiss one or more list items.
 	 * @param mode The mode this list handles multiple undos.
 	 */
-	public SwipeDismissList(AbsListView listView, OnDismissCallback callback, UndoMode mode) {
+	public SwipeDismissList(AbsListView listView, OnDismissCallback callback, UndoMode mode, String message) {
 
 		if(listView == null) {
 			throw new IllegalArgumentException("listview must not be null.");
 		}
+
+        mDeleteString = message;
 
 		mHandler = new HideUndoPopupHandler();
 		mListView = listView;
