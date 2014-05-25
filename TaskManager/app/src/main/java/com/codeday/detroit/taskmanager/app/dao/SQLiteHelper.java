@@ -44,12 +44,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DATE = "endDate";
     public static final String COLUMN_PRIORITY = "priorityLevel";
 
-    // Database creation sql statement for TABLE_GOALS
+    // Database creation sql statement for TABLE_LISTS
     private static final String CREATE_LISTS = "create table " + TABLE_LISTS + "(" + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_IDENTIFIER + " text not null," + COLUMN_NAME + " text not null, " + COLUMN_TASKS + " integer, " +
             COLUMN_TASKS_COMPLETED + " integer, " + COLUMN_ISCOMPLETE + " integer);";
 
-    // Database creation sql statement for TABLE_MILESTONES
+    // Database creation sql statement for TABLE_TASKS
     private static final String CREATE_TASKS = "create table " + TABLE_TASKS + "(" + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_IDENTIFIER + " text not null," + COLUMN_PARENT + " text not null," + COLUMN_NAME + " text not null," + COLUMN_DATE +
             " integer, " + COLUMN_PRIORITY + " integer, " + COLUMN_ISCOMPLETE + " integer);";

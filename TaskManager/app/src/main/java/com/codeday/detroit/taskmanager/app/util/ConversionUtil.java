@@ -33,11 +33,11 @@ public class ConversionUtil {
     public static TaskList cursorToTaskList(Cursor cursor) {
 
         TaskList list = new TaskList();
-        list.identifier = cursor.getString(0);
-        list.name = cursor.getString(1);
-        list.numberOfTasks = cursor.getInt(2);
-        list.numberOfCompletedTasks = cursor.getInt(3);
-        list.isComplete = cursor.getInt(4) == 1;
+        list.identifier = cursor.getString(1);
+        list.name = cursor.getString(2);
+        list.numberOfTasks = cursor.getInt(3);
+        list.numberOfCompletedTasks = cursor.getInt(4);
+        list.isComplete = cursor.getInt(5) == 1;
 
         return list;
     }
@@ -58,16 +58,16 @@ public class ConversionUtil {
     public static Task cursorToTask(Cursor cursor) {
 
         Task task = new Task();
-        task.identifier = cursor.getString(0);
-        task.parent = cursor.getString(1);
-        task.name = cursor.getString(2);
-        task.priority = cursor.getInt(3) == 1;
+        task.identifier = cursor.getString(1);
+        task.parent = cursor.getString(2);
+        task.name = cursor.getString(3);
 
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(cursor.getLong(4));
 
         task.date = cal;
-        task.isComplete = cursor.getInt(5) == 1;
+        task.priority = cursor.getInt(5) == 1;
+        task.isComplete = cursor.getInt(6) == 1;
 
         return task;
     }
