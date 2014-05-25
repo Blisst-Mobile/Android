@@ -496,10 +496,7 @@ public class TasksFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_list_database), Toast.LENGTH_SHORT).show();
-            else
-                new RetrieveTasksTask().execute(parentIdentifier);
+            if (aBoolean) new RetrieveTasksTask().execute(parentIdentifier);
         }
     }
 
@@ -516,12 +513,6 @@ public class TasksFragment extends BaseFragment {
                 list.numberOfCompletedTasks--;
             result = accessor.updateList(list) && result;
             return result;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), "Error updating task and list", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -540,12 +531,7 @@ public class TasksFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_retrieving_tasks), Toast.LENGTH_SHORT).show();
-            else {
-                adapter.notifyDataSetChanged();
-                Toast.makeText(getActivity().getApplicationContext(), "Number of lists: " + tasks.size(), Toast.LENGTH_SHORT).show();
-            }
+            if (aBoolean) adapter.notifyDataSetChanged();
         }
     }
 
