@@ -5,6 +5,7 @@ package com.codeday.detroit.taskmanager.app.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +24,30 @@ public class TasksFragment extends BaseFragment {
 
     private View rootView;
 
+    private String parentIdentifier;
+
+    public static TasksFragment getInstance(String identifier) {
+        TasksFragment frag = new TasksFragment();
+        frag.parentIdentifier = identifier;
+        return frag;
+    }
+
     public TasksFragment() {
         menuInteractionListener = new MainActivity.MenuInteractionListener() {
             @Override
             public void onAddButtonPressed() {
                 CDLog.debugLog(TAG, "Add Button Pressed!");
+            }
+
+            @Override
+            public boolean onBackButtonPressed() {
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                TaskListFragment frag = (TaskListFragment) getActivity().getSupportFragmentManager().findFragmentByTag(TaskListFragment.TAG);
+                transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+                transaction.remove(TasksFragment.this);
+                transaction.show(frag);
+                transaction.commit();
+                return true;
             }
         };
     }
