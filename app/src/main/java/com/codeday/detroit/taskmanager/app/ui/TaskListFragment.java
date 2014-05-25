@@ -234,10 +234,7 @@ public class TaskListFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_list_database), Toast.LENGTH_SHORT).show();
-            else
-                new RetrieveListsTask().execute();
+            if (aBoolean) new RetrieveListsTask().execute();
         }
     }
 
@@ -257,14 +254,10 @@ public class TaskListFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_retrieving_lists), Toast.LENGTH_SHORT).show();
-            else {
-                adapter.notifyDataSetChanged();
-                Toast.makeText(getActivity().getApplicationContext(), "Number of lists: " + taskLists.size(), Toast.LENGTH_SHORT).show();
-            }
+            if (aBoolean) adapter.notifyDataSetChanged();
         }
     }
+
     private class DeleteListTask extends AsyncTask<String, Void, Boolean> {
 
         @Override
@@ -273,13 +266,6 @@ public class TaskListFragment extends BaseFragment {
             boolean result = databaseAccessor.deleteList(params[0]);
             result = databaseAccessor.deleteAllTasksForList(params[0]) && result;
             return result;
-
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (!aBoolean)
-                Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_retrieving_lists), Toast.LENGTH_SHORT).show();
 
         }
     }
