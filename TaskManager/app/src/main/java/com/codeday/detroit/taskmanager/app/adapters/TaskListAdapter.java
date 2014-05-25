@@ -70,13 +70,19 @@ public class TaskListAdapter extends BaseAdapter {
         //int screenHeight = size.y;
 
         //set new width for progress bar layout
-//        View taskProgressBar = view.findViewById(R.id.taskProgressBar);
-//        ViewGroup.LayoutParams params = taskProgressBar.getLayoutParams();
-//        if ( numberOfTasksTotal > 0 )
-//            params.width = screenWidth * (numberOfTasksCompleted / numberOfTasksTotal);
-//        else
-//            params.width = 0;
-//        view.setLayoutParams(params);
+        View taskProgressBar = view.findViewById(R.id.taskProgressBar);
+
+
+        ViewGroup.LayoutParams params = taskProgressBar.getLayoutParams();
+
+
+        if ( numberOfTasksTotal > 0 )
+            params.width = screenWidth * (numberOfTasksCompleted / numberOfTasksTotal);
+
+        else
+            params.width = ctxt.getResources().getDimensionPixelOffset(R.dimen.listAdapter_min_progress);
+
+        taskProgressBar.requestLayout();
 
         return view;
     }
