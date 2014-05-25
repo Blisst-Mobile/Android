@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:text="" />
+        android:text=""
+        android:focusable="false"/>
 
     <TextView
         android:id="@+id/date"
