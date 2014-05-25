@@ -72,6 +72,11 @@ public class TaskListAdapter extends BaseAdapter {
         //set new width for progress bar layout
         View taskProgressBar = view.findViewById(R.id.taskProgressBar);
 
+        //rotate the line in the fraction
+        View fractionSlash = view.findViewById(R.id.separator);
+        fractionSlash.setRotation(-45);
+
+
 
         ViewGroup.LayoutParams params = taskProgressBar.getLayoutParams();
 
