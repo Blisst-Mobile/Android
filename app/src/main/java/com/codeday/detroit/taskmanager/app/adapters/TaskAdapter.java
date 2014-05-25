@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.codeday.detroit.taskmanager.app.R;
 import com.codeday.detroit.taskmanager.app.domain.Task;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -27,6 +28,8 @@ public class TaskAdapter extends BaseAdapter {
     List<Task> taskList;
     Context ctxt;
     LayoutInflater layoutInflater;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
 
     public TaskAdapter(List<Task> t, Context c) {
         taskList = t;
@@ -70,6 +73,9 @@ public class TaskAdapter extends BaseAdapter {
                 checkListener.OnCheckChanged(isChecked, position);
             }
         });
+
+        TextView date = (TextView) view.findViewById(R.id.date);
+        date.setText(sdf.format(currentTask.date.getTime()));
 
         return view;
 

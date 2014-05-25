@@ -15,12 +15,25 @@
         android:text="" />
 
     <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dip"
+        android:textSize="11dp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:text="1/2/3456" />
+
+    <TextView
         android:id="@+id/taskName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dip"
+        android:layout_toLeftOf="@id/date"
         android:layout_toRightOf="@id/taskCheckbox"
-        android:text="Task Name" />
+        android:text="Task Name"/>
 
 </RelativeLayout>
