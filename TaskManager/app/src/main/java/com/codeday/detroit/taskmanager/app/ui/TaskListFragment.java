@@ -63,11 +63,7 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_task_list, container, false);
 
-        taskLists = new ArrayList<TaskList>();
-        adapter = new TaskListAdapter(taskLists, getActivity());
-
         list = (ListView) rootView.findViewById(R.id.list);
-        list.setAdapter(adapter);
 
         return rootView;
     }
@@ -75,8 +71,12 @@ public class TaskListFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        new RetrieveListsTask().execute();
-        if ( dialog == null )
+        if ( taskLists == null ) {
+            taskLists = new ArrayList<TaskList>();
+            adapter = new TaskListAdapter(taskLists, getActivity());
+            list.setAdapter(adapter);
+            new RetrieveListsTask().execute();
+        } if ( dialog == null )
             createNewListDialog();
     }
 
