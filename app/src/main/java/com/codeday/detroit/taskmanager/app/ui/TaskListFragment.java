@@ -147,6 +147,7 @@ public class TaskListFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
+
         if ( isInitialLoad ) {
             isInitialLoad = false;
             new RetrieveListsTask().execute();

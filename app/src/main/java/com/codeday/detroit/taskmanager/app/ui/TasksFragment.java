@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,10 +31,17 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.widget.*;
+
+
 import com.codeday.detroit.taskmanager.app.CDLog;
 import com.codeday.detroit.taskmanager.app.MainActivity;
 import com.codeday.detroit.taskmanager.app.R;
+
 import com.codeday.detroit.taskmanager.app.adapters.NavSortAdapter;
+
+import com.codeday.detroit.taskmanager.app.SwipeDismissList;
+
 import com.codeday.detroit.taskmanager.app.adapters.TaskAdapter;
 import com.codeday.detroit.taskmanager.app.dao.DatabaseAccessor;
 import com.codeday.detroit.taskmanager.app.domain.Task;
@@ -64,6 +72,7 @@ public class TasksFragment extends BaseFragment {
     private ListView list;
     private TaskAdapter adapter;
     private List<Task> tasks;
+    private TaskList taskList;
 
     public static TasksFragment getInstance(String identifier) {
         TasksFragment frag = new TasksFragment();
@@ -118,6 +127,7 @@ public class TasksFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         if ( tasks == null ) {
+
             tasks = new ArrayList<Task>();
             adapter = new TaskAdapter(tasks, getActivity());
             adapter.setCheckChangedListener(new TaskAdapter.CheckChangedListener() {
@@ -129,6 +139,50 @@ public class TasksFragment extends BaseFragment {
                 }
             });
             list.setAdapter(adapter);
+
+            SwipeDismissList.OnDismissCallback callback = new SwipeDismissList.OnDismissCallback(){
+
+                @Override
+                public SwipeDismissList.Undoable onDismiss(AbsListView listView, final int position) {
+                    final Task task = tasks.get(position);
+                    tasks.remove(position);
+                    adapter.notifyDataSetChanged();
+
+                    return new SwipeDismissList.Undoable(){
+
+                        //called after undo click
+                        public void undo() {
+                            tasks.add(position, task);
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        //called after toast goes away
+                        public void discard(){
+                            new RetrieveListTask().execute(task.parent);
+                            if (taskList != null){
+                                if (task.isComplete){
+                                    taskList.numberOfCompletedTasks -= 1;
+                                }
+                                taskList.numberOfTasks -= 1;
+
+                                new UpdateListTask().execute(taskList);
+                                new DeleteTask().execute(task.identifier);
+                            }
+
+                        }
+                    };
+
+                }
+            };
+
+            SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
+            SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode);
+
+
+
+
+
+
             new RetrieveTasksTask().execute(parentIdentifier);
         } if ( dialog == null )
             createNewTaskDialog();
@@ -571,5 +625,47 @@ public class TasksFragment extends BaseFragment {
             if (aBoolean) adapter.notifyDataSetChanged();
         }
     }
+
+    private class DeleteTask extends AsyncTask<String, Void, Boolean>{
+        @Override
+        protected Boolean doInBackground(String... params) {
+            DatabaseAccessor databaseAccessor = new DatabaseAccessor();
+            boolean result = databaseAccessor.deleteTask(params[0]);
+            result = databaseAccessor.deleteTask(params[0]) && result;
+
+            //subtracting shit
+
+            return result;
+        }
+    }
+
+    private class UpdateListTask extends AsyncTask<TaskList, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(TaskList... params) {
+            if (params.length > 0) {
+                return new DatabaseAccessor().updateList(params[0]);
+            } else {
+                return false;
+            }
+        }
+        @Override
+        protected void onPostExecute(Boolean aBoolean){
+
+        }
+    }
+
+    private class RetrieveListTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(String... params) {
+            DatabaseAccessor databaseAccessor = new DatabaseAccessor();
+            taskList = databaseAccessor.getList(params[0])
+            if (taskList != null)
+                return true;
+            else
+                return false;
+        }
+    }
+
 
 }
