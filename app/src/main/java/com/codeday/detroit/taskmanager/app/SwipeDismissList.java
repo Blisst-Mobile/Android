@@ -365,13 +365,6 @@ public final class SwipeDismissList implements View.OnTouchListener {
         mUndoPopup.dismiss();
     }
 
-    /**
-     * Discard toast popup
-     */
-    public void dismissUndoToast(){
-        mUndoPopup.dismiss();
-    }
-
 	/**
 	 * Returns an {@link android.widget.AbsListView.OnScrollListener} to be
 	 * added to the {@link ListView} using
