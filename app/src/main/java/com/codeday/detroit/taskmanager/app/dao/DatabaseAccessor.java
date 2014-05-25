@@ -10,6 +10,7 @@ import com.codeday.detroit.taskmanager.app.domain.TaskList;
 import com.codeday.detroit.taskmanager.app.util.ConversionUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -74,6 +75,8 @@ public class DatabaseAccessor implements Database {
                     cursor.moveToNext();
                 }
 
+                Collections.sort(values);
+
                 cursor.close();
                 db.setTransactionSuccessful();
             }
@@ -135,6 +138,8 @@ public class DatabaseAccessor implements Database {
                     values.add(ConversionUtil.cursorToTask(cursor));
                     cursor.moveToNext();
                 }
+
+                Collections.sort(values);
 
                 cursor.close();
                 db.setTransactionSuccessful();
