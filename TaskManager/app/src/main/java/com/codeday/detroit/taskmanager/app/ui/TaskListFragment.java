@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +17,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codeday.detroit.taskmanager.app.CDLog;
-import com.codeday.detroit.taskmanager.app.GlobalContext;
-import com.codeday.detroit.taskmanager.app.MainActivity;
-import com.codeday.detroit.taskmanager.app.R;
+import com.codeday.detroit.taskmanager.app.*;
 import com.codeday.detroit.taskmanager.app.adapters.TaskListAdapter;
 import com.codeday.detroit.taskmanager.app.dao.DatabaseAccessor;
+import com.codeday.detroit.taskmanager.app.domain.Task;
 import com.codeday.detroit.taskmanager.app.domain.TaskList;
 
 import java.util.ArrayList;
@@ -92,6 +88,37 @@ public class TaskListFragment extends BaseFragment {
             taskLists = new ArrayList<TaskList>();
             adapter = new TaskListAdapter(taskLists, getActivity());
             list.setAdapter(adapter);
+
+            SwipeDismissListViewTouchListener touchListener =
+                    new SwipeDismissListViewTouchListener(
+                            list,
+                            new SwipeDismissListViewTouchListener.DismissCallbacks(){
+
+                                @Override
+                                public boolean canDismiss(int position) {
+                                    return true;
+                                }
+
+                                @Override
+                                public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                    for (int position : reverseSortedPositions){
+                                        taskLists.remove(position);
+                                        //TaskList task = taskLists.get(position);
+                                        //int test = position;
+                                    }
+                                    adapter.notifyDataSetChanged();
+
+                                }
+                            });
+            list.setOnTouchListener(touchListener);
+            list.setOnScrollListener(touchListener.makeScrollListener());
+
+
+
+
+
+
+
             new RetrieveListsTask().execute();
         } if ( dialog == null )
             createNewListDialog();
