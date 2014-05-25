@@ -20,6 +20,7 @@ import com.codeday.detroit.taskmanager.app.CDLog;
 import com.codeday.detroit.taskmanager.app.GlobalContext;
 import com.codeday.detroit.taskmanager.app.MainActivity;
 import com.codeday.detroit.taskmanager.app.R;
+import com.codeday.detroit.taskmanager.app.adapters.TaskListAdapter;
 import com.codeday.detroit.taskmanager.app.dao.DatabaseAccessor;
 import com.codeday.detroit.taskmanager.app.domain.TaskList;
 
@@ -34,6 +35,7 @@ public class TaskListFragment extends Fragment {
 
     private AlertDialog dialog;
     private ListView list;
+    private TaskListAdapter adapter;
     private List<TaskList> taskLists;
 
     private MainActivity.MenuInteractionListener menuInteractionListener;
@@ -44,7 +46,6 @@ public class TaskListFragment extends Fragment {
     }
 
     public TaskListFragment() {
-        taskLists = new ArrayList<TaskList>();
         menuInteractionListener = new MainActivity.MenuInteractionListener() {
             @Override
             public void onAddButtonPressed() {
@@ -62,7 +63,11 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_task_list, container, false);
 
+        taskLists = new ArrayList<TaskList>();
+        adapter = new TaskListAdapter(taskLists, getActivity());
+
         list = (ListView) rootView.findViewById(R.id.list);
+        list.setAdapter(adapter);
 
         return rootView;
     }
@@ -71,7 +76,8 @@ public class TaskListFragment extends Fragment {
     public void onStart() {
         super.onStart();
         new RetrieveListsTask().execute();
-        createNewListDialog();
+        if ( dialog == null )
+            createNewListDialog();
     }
 
     @Override
@@ -189,8 +195,10 @@ public class TaskListFragment extends Fragment {
         protected void onPostExecute(Boolean aBoolean) {
             if (!aBoolean)
                 Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.error_retrieving_lists), Toast.LENGTH_SHORT).show();
-            else
+            else {
+                adapter.notifyDataSetChanged();
                 Toast.makeText(getActivity().getApplicationContext(), "Number of lists: " + taskLists.size(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
