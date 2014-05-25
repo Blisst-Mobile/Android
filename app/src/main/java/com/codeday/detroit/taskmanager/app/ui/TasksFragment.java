@@ -76,6 +76,7 @@ public class TasksFragment extends BaseFragment {
     private Button taskDateField;
     private boolean isEditingTask;
     private int clickedPosition;
+    SwipeDismissList swipeList;
 
     public static TasksFragment getInstance(String identifier) {
         TasksFragment frag = new TasksFragment();
@@ -93,6 +94,9 @@ public class TasksFragment extends BaseFragment {
 
             @Override
             public boolean onBackButtonPressed() {
+                if (swipeList != null){
+                    swipeList.dismissUndoToast();
+                }
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 TaskListFragment frag = (TaskListFragment) getActivity().getSupportFragmentManager().findFragmentByTag(TaskListFragment.TAG);
                 transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -104,6 +108,9 @@ public class TasksFragment extends BaseFragment {
 
             @Override
             public boolean onMenuUpPressed() {
+                if (swipeList != null){
+                    swipeList.dismissUndoToast();
+                }
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 TaskListFragment frag = (TaskListFragment) getActivity().getSupportFragmentManager().findFragmentByTag(TaskListFragment.TAG);
                 transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -172,7 +179,7 @@ public class TasksFragment extends BaseFragment {
             };
 
             SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
-            SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode, "Task Deleted");
+            swipeList = new SwipeDismissList(list, callback, mode, "Task Deleted");
             swipeList.setAutoHideDelay(500);
 
 
