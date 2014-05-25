@@ -173,7 +173,7 @@ public class TasksFragment extends BaseFragment {
 
             SwipeDismissList.UndoMode mode = SwipeDismissList.UndoMode.SINGLE_UNDO;
             SwipeDismissList swipeList = new SwipeDismissList(list, callback, mode, "Task Deleted");
-            swipeList.setAutoHideDelay(1000);
+            swipeList.setAutoHideDelay(500);
 
 
 
