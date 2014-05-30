@@ -52,7 +52,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     // Database creation sql statement for TABLE_TASKS
     private static final String CREATE_TASKS = "create table " + TABLE_TASKS + "(" + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_IDENTIFIER + " text not null," + COLUMN_PARENT + " text not null," + COLUMN_NAME + " text not null," + COLUMN_DATE +
-            " integer, " + COLUMN_PRIORITY + " integer, " + COLUMN_ISCOMPLETE + " integer);";
+            " integer default null, " + COLUMN_PRIORITY + " integer, " + COLUMN_ISCOMPLETE + " integer);";
 
     // Accessor strings
     public static final String SQL_WHERE_BY_ID = SQLiteHelper.COLUMN_IDENTIFIER + "=?";

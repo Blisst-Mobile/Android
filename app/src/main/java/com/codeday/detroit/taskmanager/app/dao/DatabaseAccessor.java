@@ -19,7 +19,6 @@ import java.util.List;
  * This class is used to interact with the database. It handles adding and retrieving data from
  * the database. The methods in this class should not be run on the main UI thread. They should
  * be run from a separate Thread or in an AsyncTask.
- *
  */
 public class DatabaseAccessor implements Database {
 
@@ -34,7 +33,7 @@ public class DatabaseAccessor implements Database {
 
         try {
 
-            Cursor cursor = db.query(SQLiteHelper.TABLE_LISTS, null, SQLiteHelper.SQL_WHERE_BY_ID, new String[] { identifier }, null, null, null);
+            Cursor cursor = db.query(SQLiteHelper.TABLE_LISTS, null, SQLiteHelper.SQL_WHERE_BY_ID, new String[]{identifier}, null, null, null);
 
             if ((cursor != null) && (cursor.getCount() > 0)) {
                 cursor.moveToFirst();
@@ -96,7 +95,7 @@ public class DatabaseAccessor implements Database {
         db.beginTransaction();
         try {
 
-            Cursor cursor = db.query(SQLiteHelper.TABLE_LISTS, null, SQLiteHelper.SQL_WHERE_BY_ID, new String[] { identifier }, null, null, null);
+            Cursor cursor = db.query(SQLiteHelper.TABLE_LISTS, null, SQLiteHelper.SQL_WHERE_BY_ID, new String[]{identifier}, null, null, null);
 
             if ((cursor != null) && (cursor.getCount() > 0)) {
                 cursor.moveToFirst();
@@ -236,7 +235,7 @@ public class DatabaseAccessor implements Database {
         int result = 0;
         try {
 
-            result = db.delete(SQLiteHelper.TABLE_LISTS, SQLiteHelper.SQL_WHERE_BY_ID, new String[] { identifier });
+            result = db.delete(SQLiteHelper.TABLE_LISTS, SQLiteHelper.SQL_WHERE_BY_ID, new String[]{identifier});
 
             db.setTransactionSuccessful();
         } finally {
@@ -270,7 +269,7 @@ public class DatabaseAccessor implements Database {
         int result = 0;
         try {
 
-            result = db.delete(SQLiteHelper.TABLE_TASKS, SQLiteHelper.SQL_WHERE_BY_ID, new String[] { identifier });
+            result = db.delete(SQLiteHelper.TABLE_TASKS, SQLiteHelper.SQL_WHERE_BY_ID, new String[]{identifier});
 
             db.setTransactionSuccessful();
         } finally {
@@ -304,7 +303,7 @@ public class DatabaseAccessor implements Database {
         int result = 0;
         try {
 
-            result = db.delete(SQLiteHelper.TABLE_TASKS, SQLiteHelper.SQL_WHERE_BY_ID, new String[] { identifier });
+            result = db.delete(SQLiteHelper.TABLE_TASKS, SQLiteHelper.SQL_WHERE_BY_ID, new String[]{identifier});
 
             db.setTransactionSuccessful();
         } finally {
