@@ -65,7 +65,7 @@ public class TaskAdapter extends BaseAdapter {
         TextView textView = (TextView) view.findViewById(R.id.taskName);
         textView.setText(currentTask.name);
 
-        CheckBox checkBox = (CheckBox)view.findViewById(R.id.taskCheckbox);
+        CheckBox checkBox = (CheckBox) view.findViewById(R.id.taskCheckbox);
         checkBox.setChecked(currentTask.isComplete);
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -75,9 +75,11 @@ public class TaskAdapter extends BaseAdapter {
         });
 
         TextView date = (TextView) view.findViewById(R.id.date);
-        date.setText(sdf.format(currentTask.date.getTime()));
+        if (currentTask.date.getTimeInMillis() > 0)
+            date.setText(sdf.format(currentTask.date.getTime()));
+        else
+            date.setText("N/A");
 
         return view;
-
     }
 }

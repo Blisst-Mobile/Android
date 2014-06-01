@@ -70,7 +70,6 @@ public class TasksFragment extends BaseFragment {
     private ListView list;
     private TaskAdapter adapter;
     private List<Task> tasks;
-    private TaskList taskList;
 
     private EditText taskNameField;
     private Button taskDateField;
@@ -181,7 +180,6 @@ public class TasksFragment extends BaseFragment {
             swipeList.setAutoHideDelay(500);
 
 
-
             list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -246,7 +244,7 @@ public class TasksFragment extends BaseFragment {
         View layout = getActivity().getLayoutInflater().inflate(R.layout.dialog_new_task, null);
 
         taskNameField = (EditText) layout.findViewById(R.id.name);
-        taskDateField  = (Button) layout.findViewById(R.id.date);
+        taskDateField = (Button) layout.findViewById(R.id.date);
         final LinearLayout buttonLayout = (LinearLayout) layout.findViewById(R.id.button_layout);
         final TextView cancelButton = (TextView) layout.findViewById(R.id.cancel);
         final TextView saveButton = (TextView) layout.findViewById(R.id.save);
@@ -453,7 +451,7 @@ public class TasksFragment extends BaseFragment {
                     chosenDate.set(Calendar.MILLISECOND, 0);
 
                     today.set(Calendar.MONTH, month);
-                    taskDateField.setText("  " + today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) +" " + day + ", " + year);
+                    taskDateField.setText("  " + today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) + " " + day + ", " + year);
                     isDatePickerDisplayed = false;
 
                     saveButton.setText(getResources().getString(R.string.save));
@@ -508,32 +506,32 @@ public class TasksFragment extends BaseFragment {
                     String name = taskNameField.getText().toString();
 
                     if (name != null && name.length() > 0) {
+                        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (inputMethodManager != null) {
+                            inputMethodManager.hideSoftInputFromWindow(taskNameField.getWindowToken(), 0);
+                        }
+                        dialog.dismiss();
 
-                        if (chosenDate != null) {
-                            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                            if (inputMethodManager != null) {
-                                inputMethodManager.hideSoftInputFromWindow(taskNameField.getWindowToken(), 0);
-                            }
-                            dialog.dismiss();
+                        if (isEditingTask) {
 
-                            if ( isEditingTask ) {
-
-                                Task task = tasks.get(clickedPosition);
-                                task.name = name;
+                            Task task = tasks.get(clickedPosition);
+                            task.name = name;
+                            if (chosenDate != null) {
                                 task.date = chosenDate;
-
-                                new UpdateTaskInDatabaseTask().execute(task);
-
-                            } else {
-                                Task task = new Task();
-                                task.name = name;
-                                task.date = chosenDate;
-                                task.parent = parentIdentifier;
-
-                                new AddTaskToDatabaseTask().execute(new Task[]{task});
                             }
+
+
+                            new UpdateTaskInDatabaseTask().execute(task);
+
                         } else {
-                            Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.task_date_not_valid), Toast.LENGTH_SHORT).show();
+                            Task task = new Task();
+                            task.name = name;
+                            if (chosenDate != null) {
+                                task.date = chosenDate;
+                            }
+                            task.parent = parentIdentifier;
+
+                            new AddTaskToDatabaseTask().execute(new Task[]{task});
                         }
 
                     } else {
@@ -586,12 +584,12 @@ public class TasksFragment extends BaseFragment {
     }
 
     private void showNewTaskDialog(String name, Calendar date) {
-        if ( dialog != null ) {
+        if (dialog != null) {
 
-            if ( name != null && date != null ) {
+            if (name != null && date != null) {
                 taskNameField.setText(name);
                 taskDateField.setText("  " + date.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) + " " + date.get(Calendar.DAY_OF_MONTH) + ", " + date.get(Calendar.YEAR));
-                if ( chosenDate == null ) {
+                if (chosenDate == null) {
                     chosenDate = Calendar.getInstance();
                     chosenDate.setTime(date.getTime());
                 }
@@ -628,7 +626,7 @@ public class TasksFragment extends BaseFragment {
         protected Boolean doInBackground(Task... params) {
             DatabaseAccessor accessor = new DatabaseAccessor();
             boolean result = accessor.updateTask(params[0]);
-            if ( !isEditingTask) {
+            if (!isEditingTask) {
                 TaskList list = accessor.getList(params[0].parent);
                 if (params[0].isComplete)
                     list.numberOfCompletedTasks++;
@@ -642,7 +640,7 @@ public class TasksFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if ( aBoolean && isEditingTask )
+            if (aBoolean && isEditingTask)
                 new RetrieveTasksTask().execute(parentIdentifier);
         }
     }
