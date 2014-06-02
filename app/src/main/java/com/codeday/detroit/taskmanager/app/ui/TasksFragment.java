@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +77,9 @@ public class TasksFragment extends BaseFragment {
     private boolean isEditingTask;
     private int clickedPosition;
     SwipeDismissList swipeList;
+    //date starts off being sorted in ascending order
+    private boolean isDateSortedAsc = true;
+    private boolean isNameSortedAsc = false;
 
     public static TasksFragment getInstance(String identifier) {
         TasksFragment frag = new TasksFragment();
@@ -199,31 +203,54 @@ public class TasksFragment extends BaseFragment {
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
         Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
-        ActionBar actionBar = getActivity().getActionBar();
+        final ActionBar actionBar = getActivity().getActionBar();
 
         if (enter) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
             final ArrayList<String> sortByItems = new ArrayList<String>();
+            sortByItems.add("Sort By...");
             sortByItems.add("Date");
             sortByItems.add("Name");
 
-            NavSortAdapter spinnerAdapter = new NavSortAdapter(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, sortByItems);
+            final NavSortAdapter spinnerAdapter = new NavSortAdapter(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, sortByItems);
             actionBar.setListNavigationCallbacks(spinnerAdapter, new ActionBar.OnNavigationListener() {
                 @Override
                 public boolean onNavigationItemSelected(int itemPosition, long itemId) {
                     switch (itemPosition) {
-                        case 0: // Date
-                            Collections.sort(tasks);
+                        case 0: //default (Sort By...)
+                            return true;
+                        case 1: // Date
+                            //if date was already sorted in ascending order,
+                            //sort it in descending order instead
+                            if (isDateSortedAsc == true) {
+                                Collections.reverse(tasks);
+                                isDateSortedAsc = false;
+                                isNameSortedAsc = false;
+                            } else {
+                                Collections.sort(tasks);
+                                isDateSortedAsc = true;
+                                isNameSortedAsc = false;
+                            }
+                            actionBar.setSelectedNavigationItem(0);
                             adapter.notifyDataSetChanged();
                             return true;
-                        case 1: // Name
-                            Collections.sort(tasks, new Comparator<Task>() {
-                                @Override
-                                public int compare(Task task1, Task task2) {
-                                    return task1.name.compareToIgnoreCase(task2.name);
-                                }
-                            });
+                        case 2: // Name
+                            if (isNameSortedAsc == false) {
+                                Collections.sort(tasks, new Comparator<Task>() {
+                                    @Override
+                                    public int compare(Task task1, Task task2) {
+                                        return task1.name.compareToIgnoreCase(task2.name);
+                                    }
+                                });
+                                isDateSortedAsc = false;
+                                isNameSortedAsc = true;
+                            }else{
+                                Collections.reverse(tasks);
+                                isNameSortedAsc = false;
+                                isDateSortedAsc = false;
+                            }
+                            actionBar.setSelectedNavigationItem(0);
                             adapter.notifyDataSetChanged();
                             return true;
                     }
@@ -698,3 +725,4 @@ public class TasksFragment extends BaseFragment {
 
 
 }
+
