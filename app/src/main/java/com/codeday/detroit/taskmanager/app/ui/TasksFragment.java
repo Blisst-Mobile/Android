@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,13 +71,15 @@ public class TasksFragment extends BaseFragment {
     private ListView list;
     private TaskAdapter adapter;
     private List<Task> tasks;
-    private TaskList taskList;
 
     private EditText taskNameField;
     private Button taskDateField;
     private boolean isEditingTask;
     private int clickedPosition;
     SwipeDismissList swipeList;
+    //date starts off being sorted in ascending order
+    private boolean isDateSortedAsc = true;
+    private boolean isNameSortedAsc = false;
 
     public static TasksFragment getInstance(String identifier) {
         TasksFragment frag = new TasksFragment();
@@ -181,7 +184,6 @@ public class TasksFragment extends BaseFragment {
             swipeList.setAutoHideDelay(500);
 
 
-
             list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -201,31 +203,54 @@ public class TasksFragment extends BaseFragment {
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
         Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
-        ActionBar actionBar = getActivity().getActionBar();
+        final ActionBar actionBar = getActivity().getActionBar();
 
         if (enter) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
             final ArrayList<String> sortByItems = new ArrayList<String>();
+            sortByItems.add("Sort By...");
             sortByItems.add("Date");
             sortByItems.add("Name");
 
-            NavSortAdapter spinnerAdapter = new NavSortAdapter(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, sortByItems);
+            final NavSortAdapter spinnerAdapter = new NavSortAdapter(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, sortByItems);
             actionBar.setListNavigationCallbacks(spinnerAdapter, new ActionBar.OnNavigationListener() {
                 @Override
                 public boolean onNavigationItemSelected(int itemPosition, long itemId) {
                     switch (itemPosition) {
-                        case 0: // Date
-                            Collections.sort(tasks);
+                        case 0: //default (Sort By...)
+                            return true;
+                        case 1: // Date
+                            //if date was already sorted in ascending order,
+                            //sort it in descending order instead
+                            if (isDateSortedAsc == true) {
+                                Collections.reverse(tasks);
+                                isDateSortedAsc = false;
+                                isNameSortedAsc = false;
+                            } else {
+                                Collections.sort(tasks);
+                                isDateSortedAsc = true;
+                                isNameSortedAsc = false;
+                            }
+                            actionBar.setSelectedNavigationItem(0);
                             adapter.notifyDataSetChanged();
                             return true;
-                        case 1: // Name
-                            Collections.sort(tasks, new Comparator<Task>() {
-                                @Override
-                                public int compare(Task task1, Task task2) {
-                                    return task1.name.compareToIgnoreCase(task2.name);
-                                }
-                            });
+                        case 2: // Name
+                            if (isNameSortedAsc == false) {
+                                Collections.sort(tasks, new Comparator<Task>() {
+                                    @Override
+                                    public int compare(Task task1, Task task2) {
+                                        return task1.name.compareToIgnoreCase(task2.name);
+                                    }
+                                });
+                                isDateSortedAsc = false;
+                                isNameSortedAsc = true;
+                            }else{
+                                Collections.reverse(tasks);
+                                isNameSortedAsc = false;
+                                isDateSortedAsc = false;
+                            }
+                            actionBar.setSelectedNavigationItem(0);
                             adapter.notifyDataSetChanged();
                             return true;
                     }
@@ -246,7 +271,7 @@ public class TasksFragment extends BaseFragment {
         View layout = getActivity().getLayoutInflater().inflate(R.layout.dialog_new_task, null);
 
         taskNameField = (EditText) layout.findViewById(R.id.name);
-        taskDateField  = (Button) layout.findViewById(R.id.date);
+        taskDateField = (Button) layout.findViewById(R.id.date);
         final LinearLayout buttonLayout = (LinearLayout) layout.findViewById(R.id.button_layout);
         final TextView cancelButton = (TextView) layout.findViewById(R.id.cancel);
         final TextView saveButton = (TextView) layout.findViewById(R.id.save);
@@ -453,7 +478,7 @@ public class TasksFragment extends BaseFragment {
                     chosenDate.set(Calendar.MILLISECOND, 0);
 
                     today.set(Calendar.MONTH, month);
-                    taskDateField.setText("  " + today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) +" " + day + ", " + year);
+                    taskDateField.setText("  " + today.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) + " " + day + ", " + year);
                     isDatePickerDisplayed = false;
 
                     saveButton.setText(getResources().getString(R.string.save));
@@ -508,32 +533,32 @@ public class TasksFragment extends BaseFragment {
                     String name = taskNameField.getText().toString();
 
                     if (name != null && name.length() > 0) {
+                        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (inputMethodManager != null) {
+                            inputMethodManager.hideSoftInputFromWindow(taskNameField.getWindowToken(), 0);
+                        }
+                        dialog.dismiss();
 
-                        if (chosenDate != null) {
-                            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                            if (inputMethodManager != null) {
-                                inputMethodManager.hideSoftInputFromWindow(taskNameField.getWindowToken(), 0);
-                            }
-                            dialog.dismiss();
+                        if (isEditingTask) {
 
-                            if ( isEditingTask ) {
-
-                                Task task = tasks.get(clickedPosition);
-                                task.name = name;
+                            Task task = tasks.get(clickedPosition);
+                            task.name = name;
+                            if (chosenDate != null) {
                                 task.date = chosenDate;
-
-                                new UpdateTaskInDatabaseTask().execute(task);
-
-                            } else {
-                                Task task = new Task();
-                                task.name = name;
-                                task.date = chosenDate;
-                                task.parent = parentIdentifier;
-
-                                new AddTaskToDatabaseTask().execute(new Task[]{task});
                             }
+
+
+                            new UpdateTaskInDatabaseTask().execute(task);
+
                         } else {
-                            Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.task_date_not_valid), Toast.LENGTH_SHORT).show();
+                            Task task = new Task();
+                            task.name = name;
+                            if (chosenDate != null) {
+                                task.date = chosenDate;
+                            }
+                            task.parent = parentIdentifier;
+
+                            new AddTaskToDatabaseTask().execute(new Task[]{task});
                         }
 
                     } else {
@@ -586,12 +611,12 @@ public class TasksFragment extends BaseFragment {
     }
 
     private void showNewTaskDialog(String name, Calendar date) {
-        if ( dialog != null ) {
+        if (dialog != null) {
 
-            if ( name != null && date != null ) {
+            if (name != null && date != null) {
                 taskNameField.setText(name);
                 taskDateField.setText("  " + date.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) + " " + date.get(Calendar.DAY_OF_MONTH) + ", " + date.get(Calendar.YEAR));
-                if ( chosenDate == null ) {
+                if (chosenDate == null) {
                     chosenDate = Calendar.getInstance();
                     chosenDate.setTime(date.getTime());
                 }
@@ -628,7 +653,7 @@ public class TasksFragment extends BaseFragment {
         protected Boolean doInBackground(Task... params) {
             DatabaseAccessor accessor = new DatabaseAccessor();
             boolean result = accessor.updateTask(params[0]);
-            if ( !isEditingTask) {
+            if (!isEditingTask) {
                 TaskList list = accessor.getList(params[0].parent);
                 if (params[0].isComplete)
                     list.numberOfCompletedTasks++;
@@ -642,7 +667,7 @@ public class TasksFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if ( aBoolean && isEditingTask )
+            if (aBoolean && isEditingTask)
                 new RetrieveTasksTask().execute(parentIdentifier);
         }
     }
@@ -700,3 +725,4 @@ public class TasksFragment extends BaseFragment {
 
 
 }
+

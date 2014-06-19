@@ -14,7 +14,6 @@ import java.util.Calendar;
  *
  * This class is used to convert classes specified in the domain package into various objects
  * such as a Bundle or Cursor. It can be used to extract data from those objects as well.
- *
  */
 public class ConversionUtil {
 
@@ -43,15 +42,14 @@ public class ConversionUtil {
     }
 
     public static ContentValues taskToContentValues(Task task) {
-
         ContentValues args = new ContentValues();
         args.put(SQLiteHelper.COLUMN_IDENTIFIER, task.identifier);
         args.put(SQLiteHelper.COLUMN_PARENT, task.parent);
         args.put(SQLiteHelper.COLUMN_NAME, task.name);
         args.put(SQLiteHelper.COLUMN_PRIORITY, task.priority ? 1 : 0);
-        args.put(SQLiteHelper.COLUMN_DATE, task.date.getTimeInMillis());
+        if (task.date != null)
+            args.put(SQLiteHelper.COLUMN_DATE, task.date.getTimeInMillis());
         args.put(SQLiteHelper.COLUMN_ISCOMPLETE, task.isComplete ? 1 : 0);
-
         return args;
     }
 
@@ -62,8 +60,13 @@ public class ConversionUtil {
         task.parent = cursor.getString(2);
         task.name = cursor.getString(3);
 
+        //recognizing an empty date consists of checking if
+        //TimeInMillis equals 0
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(cursor.getLong(4));
+        if (cursor.getLong(4) < 1)
+            cal.setTimeInMillis(0);
+        else
+            cal.setTimeInMillis(cursor.getLong(4));
 
         task.date = cal;
         task.priority = cursor.getInt(5) == 1;
